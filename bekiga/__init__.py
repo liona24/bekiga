@@ -1,0 +1,2 @@
+from .bekiga import app
+
