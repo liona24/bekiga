@@ -1,0 +1,114 @@
+<template>
+    <form>
+        <fieldset>
+            <legend align="top">
+                Objekt/Einrichtung
+            </legend>
+            <img :src="pictureData" v-show="pictureData">
+            <label>
+                <span>Name:</span> 
+                <input type="text" placeholder="Name" v-model="props.name">
+            </label>
+            <label>
+                <span>Straße/Hausnummer:</span> 
+                <input type="text" placeholder="Straße" v-model="props.street">
+            </label>
+            <label>
+                <span>Postleitzahl:</span> 
+                <input type="text" placeholder="Postleitzahl" v-model="props.zipCode">
+            </label>
+            <label>
+                <span>Stadt:</span> 
+                <input type="text" placeholder="Stadt" v-model="props.city">
+            </label>
+            <label>
+                <span>Bild anf&uuml;gen:</span>
+                <input type="file" accept="image/*" v-on:change="handlePictureUpload">
+            </label>
+            <br>
+            <input type="button" @click="submit" style="float: right" value="Speichern">
+        </fieldset>
+    </form>
+</template>
+
+<script>
+
+import { EventBus } from '../EventBus.js'
+const $ = require('jquery');
+
+export default {
+    name: 'FormFacility',
+    components: {
+    },
+    props: {
+        name: {
+            default: ''
+        }
+    },
+    data: function() {
+        return {
+            props: {
+                name: '',
+                street: '',
+                zipCode: '',
+                city: '',
+                picture: '',
+            },
+            pictureData: ''
+        };
+    },
+    created: function() {
+        this.props.name = this.name;
+    },
+    methods: {
+        handlePictureUpload: function(e) {
+            let file = e.target.files[0];
+            this.props.picture = file;
+            let reader = new FileReader();
+            reader.addEventListener('load', () => {
+                this.pictureData = reader.result;
+                this.$emit('imageLoaded', reader.result);
+            }, false);
+            reader.readAsDataURL(file);
+        },
+        submit: function(e) {
+            if (this.props.name.length === 0) {
+                alert('Name benötigt!');
+                return;
+            }
+            $(e.target).prop('disabled', true);
+
+            let formData = new FormData();
+            formData.append('name', this.props.name);
+            formData.append('zipCode', this.props.zipCode);
+            formData.append('street', this.props.street);
+            formData.append('city', this.props.city);
+            formData.append('pic', this.props.picture);
+
+            $.ajax({
+                url : 'http://localhost:5000/facilities/',
+                data: formData,
+                contentType: false,
+                cache: false,
+                processData: false,
+                type: 'POST',
+                success: (resp) => {
+                    console.log('FACILITY CREATED');
+                    console.log(resp);
+
+                    EventBus.$emit('newFacilityAdded', { data: Object.assign({ _id: result.id }, Object(this.props)) })
+                    this.$emit('close', { success: true });
+                }
+            });
+        }
+    }
+}
+</script>
+
+<style scoped>
+img {
+    width: 150px;
+    height: auto;
+    float: right;
+}
+</style>
