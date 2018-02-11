@@ -19,7 +19,7 @@ export default {
     props: {
         value: String,
         collection: String,
-        on: String,
+        mkey: String,
 
         placeholder: {
             default: ''

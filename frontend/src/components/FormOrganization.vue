@@ -2,11 +2,23 @@
     <form>
         <fieldset>
             <legend align="top">
-                Pr&uuml;fkriterium 
+            Organisation
             </legend>
             <label>
                 <span>Name:</span> 
                 <input type="text" placeholder="Name" v-model="props.name">
+            </label>
+            <label>
+                <span>Straße/Hausnummer:</span> 
+                <input type="text" placeholder="Straße" v-model="props.street">
+            </label>
+            <label>
+                <span>Postleitzahl:</span> 
+                <input type="text" placeholder="Postleitzahl" v-model="props.zipCode">
+            </label>
+            <label>
+                <span>Stadt:</span> 
+                <input type="text" placeholder="Stadt" v-model="props.city">
             </label>
             <br>
             <input type="button" @click="submit" style="float: right" value="Speichern">
@@ -17,11 +29,14 @@
 <script>
 
 import { EventBus } from '../EventBus.js'
+import apiUrl from '../apiUrl.js'
+
 const $ = require('jquery');
 
 export default {
-    name: 'FormInspectionstandard',
+    name: 'FormOrganization',
     components: {
+        Selection,
     },
     props: {
         name: {
@@ -32,6 +47,9 @@ export default {
         return {
             props: {
                 name: '',
+                street: '',
+                zipCode: '',
+                city: '',
             },
         };
     },
@@ -48,20 +66,29 @@ export default {
 
             let formData = new FormData();
             formData.append('name', this.props.name);
+            formData.append('street', this.props.street);
+            formData.append('city', this.props.city);
+            formData.append('zipCode', this.props.zipCode);
 
             $.ajax({
-                url : 'http://localhost:5000/inspectionStandards/',
+                url : apiUrl + 'organizations/',
                 data: formData,
                 contentType: false,
                 cache: false,
                 processData: false,
                 type: 'POST',
                 success: (resp) => {
-                    console.log('INSPECTION_STANDARD CREATED');
+                    console.log('ORGANIZATION CREATED');
                     console.log(resp);
 
-                    EventBus.$emit('newInspectionStandardAdded', { data: Object.assign({ _id: result.id }, Object(this.props)) })
-                    this.$emit('close', { success: true });
+                    let _id = resp.result._id;
+                    let newItem = {
+                        data: Object.assign({ _id: _id }, Object(this.props)),
+                        repr: this.props.name
+                    };
+
+                    EventBus.$emit('newOrganizationAdded', newItem);
+                    this.$parent.$emit('close', { success: true });
                 }
             });
         }
@@ -71,4 +98,3 @@ export default {
 
 <style>
 </style>
-

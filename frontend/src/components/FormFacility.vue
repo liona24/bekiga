@@ -34,6 +34,8 @@
 <script>
 
 import { EventBus } from '../EventBus.js'
+import apiUrl from '../apiUrl.js'
+
 const $ = require('jquery');
 
 export default {
@@ -83,10 +85,9 @@ export default {
             formData.append('zipCode', this.props.zipCode);
             formData.append('street', this.props.street);
             formData.append('city', this.props.city);
-            formData.append('pic', this.props.picture);
 
             $.ajax({
-                url : 'http://localhost:5000/facilities/',
+                url : apiUrl + 'facilities/',
                 data: formData,
                 contentType: false,
                 cache: false,
@@ -95,9 +96,31 @@ export default {
                 success: (resp) => {
                     console.log('FACILITY CREATED');
                     console.log(resp);
+                    let _id = resp.result._id;
 
-                    EventBus.$emit('newFacilityAdded', { data: Object.assign({ _id: result.id }, Object(this.props)) })
-                    this.$emit('close', { success: true });
+                    let newItem = { 
+                        repr: this.props.name,
+                        data: Object.assign({ _id: _id }, Object(this.props)),
+                    };
+
+                    EventBus.$emit('newFacilityAdded', newItem);
+                    console.log(_id);
+
+                    if (this.props.picture) {
+                        let formData = new FormData();
+                        formData.append('pic', this.props.picture);
+                        formData.append('_id', 'facility_' + _id)
+                        $.ajax({
+                            url : apiUrl + 'files/',
+                            data: formData,
+                            contentType: false,
+                            cache: false,
+                            processData: false,
+                            type: 'POST'
+                        });
+                    }
+
+                    this.$parent.$emit('close', { success: true });
                 }
             });
         }

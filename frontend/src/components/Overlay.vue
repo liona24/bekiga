@@ -2,7 +2,7 @@
 <div>
     <div class="overlay" :style="styleObject">
         <a href="javascript:void(0)" class="close" @click="$emit('close', { sucess: false })">&times;</a>
-        <slot @close="$emit('close', $event)"></slot>
+        <slot v-if="show"></slot>
     </div>
 </div>
 </template>

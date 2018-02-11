@@ -34,6 +34,8 @@ import FormOrganization from './FormOrganization'
 import Selection from './Selection'
 
 import { EventBus } from '../EventBus.js'
+import apiUrl from '../apiUrl.js'
+
 const $ = require('jquery');
 
 export default {
@@ -79,7 +81,7 @@ export default {
             formData.append('organization', this.props.organization.data._id);
 
             $.ajax({
-                url : 'http://localhost:5000/persons/',
+                url : apiUrl + 'persons/',
                 data: formData,
                 contentType: false,
                 cache: false,
@@ -89,8 +91,14 @@ export default {
                     console.log('PERSON CREATED');
                     console.log(resp);
 
-                    EventBus.$emit('newPersonAdded', { data: Object.assign({ _id: result.id }, Object(this.props)) })
-                    this.$emit('close', { success: true });
+                    let _id = resp.result._id;
+                    let newItem = {
+                        data: Object.assign({ _id: _id }, Object(this.props)),
+                        repr: this.props.name
+                    };
+
+                    EventBus.$emit('newPersonAdded', newItem);
+                    this.$parent.$emit('close', { success: true });
                 }
             });
         }

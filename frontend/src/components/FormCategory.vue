@@ -32,6 +32,7 @@ import Selection from './Selection'
 import FormInspectionstandard from './FormInspectionstandard'
 
 import { EventBus } from '../EventBus.js'
+import apiUrl from '../apiUrl.js'
 
 const $ = require('jquery');
 
@@ -72,7 +73,7 @@ export default {
         }
     },
     methods: {
-        submit: function() {
+        submit: function(e) {
             if (this.props.name.length === 0) {
                 alert('Name benötigt!');
                 return;
@@ -84,7 +85,7 @@ export default {
             formData.append('inspectionStandards', this.props.inspectionStandards.map((i) => i.data._id));
 
             $.ajax({
-                url : 'http://localhost:5000/categories/',
+                url : apiUrl + 'categories/',
                 data: formData,
                 contentType: false,
                 cache: false,
@@ -94,8 +95,15 @@ export default {
                     console.log('CATEGORY CREATED');
                     console.log(resp);
 
-                    EventBus.$emit('newCategoryAdded', { data: Object.assign({ _id: result.id }, Object(this.props)) })
-                    this.$emit('close', { success: true });
+                    let id = resp.result._id;
+
+                    let newItem = { 
+                        data: Object.assign({ _id: id }, Object(this.props)),
+                        repr: this.props.name
+                    };
+
+                    EventBus.$emit('newCategoryAdded', newItem);
+                    this.$parent.$emit('close', { success: true });
                 }
             });
         }
