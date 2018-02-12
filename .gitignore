@@ -1,14 +1,5 @@
 # See https://help.github.com/ignore-files/ for more about ignoring files.
 
-# dependencies
-react-app/node_modules
-
-# testing
-react-app/coverage
-
-# production
-react-app/build
-
 # misc
 .DS_Store
 .env.local
