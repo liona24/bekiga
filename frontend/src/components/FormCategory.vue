@@ -9,11 +9,15 @@
                 <input type="text" placeholder="Name" v-model="props.name">
             </label>
 
-            <ul>
-                <li v-for="(std, idx) in props.inspectionStandards" :key="'inspectionStandard' + idx">
-                    {{ std.repr }}
-                </li>
-            </ul>
+            <div class="list">
+                <label v-for="(std, idx) in props.inspectionStandards" :key="'inspectionStandard' + idx">
+                    <span></span>
+                    <div style="display: inline-block">
+                        <input type="text" :value="std.repr" class="selected-item" disabled>
+                        <div @click="remove(idx)" class="clear"><span>&times;</span></div>
+                    </div>
+                </label>
+            </div>
                 
             <label>
                 <span>Pr&uuml;fkriterium aufnehmen:</span>
@@ -73,6 +77,9 @@ export default {
         }
     },
     methods: {
+        remove: function(idx) {
+            this.props.inspectionStandards.splice(idx, 1);
+        },
         submit: function(e) {
             if (this.props.name.length === 0) {
                 alert('Name benötigt!');
@@ -112,5 +119,39 @@ export default {
 </script>
 
 <style scoped>
-/* TODO style list */
+
+.selected-item {
+    float: left;
+    width: 377px;
+}
+
+div.clear {
+    cursor: pointer;
+    float: left;
+    margin-top: 7px;
+    margin-bottom: 7px;
+}
+
+.clear span {
+    float:left; 
+    width:16px;
+    height:29px; 
+    line-height:27px; 
+    margin-right:15px; 
+    padding:0 10px 0 10px;
+    font-family: "Lucida Sans", "Lucida Sans Unicode", sans-serif;
+    font-size:22px; 
+    color: rgb(136, 136, 136);
+    background: #fff;  
+    border:solid 1px #d9d9d9; 
+    border-top:solid 1px #c0c0c0; 
+    border-left:none;
+    -webkit-box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+}
+
+.clear span:hover {
+    color: #000;
+}
 </style>
