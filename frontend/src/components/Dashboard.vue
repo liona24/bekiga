@@ -21,32 +21,30 @@
 <script>
 export default {
     name: 'Dashboard',
-    props: ['value'],
+    props: {
+        value: String,
+    },
     data: function() {
-        return {
-            state: ''
-        };
+        return {};
     },
-    created: function() {
-        this.state = this.value;
-    },
-    watch: {
-        state: function() {
-            this.$emit('input', this.state);
-        }
+    computed: {
+        state: function() { return this.value; }
     },
     methods: {
         goback: function() {
-            this.state = 'MAIN_MENU';
+            this.setState('MAIN_MENU');
         },
         protocolAdd: function() {
-            this.state = 'PROTOCOL_ADD';
+            this.setState('PROTOCOL_ADD');
         },
         protocolLoad: function() {
-            this.state = 'PROTOCOL_LOAD';
+            this.setState('PROTOCOL_LOAD');
         },
         logout: function() {
             console.log('WHOOHOOHOOO easy there..');
+        },
+        setState: function(newVal) {
+            this.$emit('input', newVal);
         }
     }
 }

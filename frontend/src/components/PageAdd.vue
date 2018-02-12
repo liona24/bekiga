@@ -9,6 +9,7 @@
         @delete="deleteEntry(index)">
     </form-entry>
     <input type="button" value="+" @click="addEntry" class="add-entry">
+    <input type="button" value="Speichern" @click="submit" class="protocol-submit">
 </div>
 
 </template>
@@ -72,7 +73,7 @@ export default {
                 title: '',
                 manufacturer: '',
                 yearBuilt: '', 
-                checkSign: '',
+                inspectionSigns: '',
                 manufactureInfoAvailable: 'Keine Angabe', 
                 easyAccess: 'Keine Angabe',
             };
@@ -107,6 +108,9 @@ export default {
             this.protocol.entries.splice(index, 1);
             EventBus.$emit('flash', { msg: 'Eintrag wurde gelöscht', status: 'okay' });
         },
+        submit: function() {
+            this.$emit('submit');
+        }
     }
 }
 </script>
@@ -124,6 +128,18 @@ input[type=button].add-entry {
     right: 10%;
     font-size: 20px;
     font-weight: 500;
+}
+
+input[type="button"].protocol-submit {
+    display: block;
+    text-align: center;
+    width: 800px;
+    height: 40px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-weight: bold;
 }
 
 </style>

@@ -1,12 +1,10 @@
 
 <template>
     <form>
-        <input type="button" @click="$emit('delete')" value="X" class="btn-delete" style="left: 96%;" v-show="!locked">
+        <input type="button" @click="$emit('delete')" value="X" class="btn-delete" style="left: 96%;">
         <fieldset>
-            <legend align="top">
-                <label>&#128274;
-                    <input type="checkbox" v-model="locked">
-                </label>
+            <legend>
+                Eintrag
             </legend>
 
             <div class="category">
@@ -50,29 +48,29 @@
                 <br>
                 <fieldset>
                     <legend align="right">
-                        <input type="button" @click="removeFlawInfo(index)" class="btn-delete" value="X" v-show="!locked">
+                        <input type="button" @click="removeFlawInfo(index)" class="btn-delete" value="X">
                     </legend>
                     <img :src="fi.pictureData" v-show="fi.pictureData">
                     <label>
                         <span>Mangel:</span> 
-                        <autocomplete-input collection="flaws" mkey="flaw" v-model="fi.flaw" placeholder="Mangel" :disabled="locked"></autocomplete-input>
+                        <autocomplete-input collection="flaws" mkey="flaw" v-model="fi.flaw" placeholder="Mangel"></autocomplete-input>
                     </label>
                     <label>
                         <span>Priorit&auml;t:</span>
-                        <autocomplete-input collection="flaws" mkey="priority" v-model="fi.priority" placeholder="Priorität" :disabled="locked"/>
+                        <autocomplete-input collection="flaws" mkey="priority" v-model="fi.priority" placeholder="Priorität"/>
                     </label>
                     <label>
                         <span>Bemerkungen:</span>
-                        <textarea v-model="fi.notes" placeholder="Bemerkungen" :disabled="locked"></textarea>
+                        <textarea v-model="fi.notes" placeholder="Bemerkungen"></textarea>
                     </label>
                     <label>
                         <span>Bild anf&uuml;gen:</span>
-                        <input type="file" accept="image/*" v-on:change="handlePictureUpload($event, fi)" :disabled="locked">
+                        <input type="file" accept="image/*" v-on:change="handlePictureUpload($event, fi)">
                     </label>
                 </fieldset>
             </div>
             <br>
-            <input type="button" @click="addFlawInfo" style="float: right" value="+ Mangel" v-show="!locked">
+            <input type="button" @click="addFlawInfo" style="float: right" value="+ Mangel">
         </fieldset>
     </form>
 </template>
@@ -101,9 +99,6 @@ export default {
     data: function() {
         return {
             props: '',
-            newFlawInfo: {
-            },
-            locked: false
         };
     },
     created: function() {
@@ -118,7 +113,7 @@ export default {
             title: '',
             manufacturer: '',
             yearBuilt: '', 
-            checkSign: '',
+            inspectionSigns: '',
             manufactureInfoAvailable: 'Keine Angabe', 
             easyAccess: 'Keine Angabe',
         };
@@ -155,84 +150,7 @@ export default {
         },
         addFlawInfo: function() {
             this.props.flawInformation.push(this.newFlawInfoData());
-            /*
-            let obj = {};
-            if (this.newFlawInfo.flaw) {
-                obj.flaw = this.newFlawInfo.flaw;
-                this.newFlawInfo.flaw = '';
-            }
-            if (this.newFlawInfo.notes) {
-                obj.notes = this.newFlawInfo.notes;
-                this.newFlawInfo.notes = '';
-            }
-            if (this.newFlawInfo.priority) {
-                obj.priority = this.newFlawInfo.priority;
-                this.newFlawInfo.priority = '';
-            }
-            if (this.newFlawInfo.picture) {
-                obj.pic = this.newflawInfo.picture;
-                this.newFlawInfo.picture = '';
-
-                // Reset input
-                const inp = this.$refs.newPictureInput;
-                inp.type = 'text';
-                inp.type = 'file';
-            }
-            if (!obj) {
-                return;
-            }
-
-            if (obj.pic) {
-                let reader = new FileReader();
-                let pic = obj.pic;
-                obj.pic = '';
-                reader.addEventListener('load', () => {
-                    obj.pic = reader.result;
-                }, false);
-                reader.readAsDataURL(pic);
-            }
-            this.properties.flawInformation.push(obj);
-            */
-/*
-            let formData = new FormData();
-            formData.append('flaw', obj.flaw);
-            formData.append('notes', obj.notes);
-            formData.append('priority', obj.priority);
-            formData.append('pic', obj.pic);
-
-            $.ajax({
-                url : 'http://localhost:5000/_uploads/flaws/',
-                data: formData,
-                contentType: false,
-                cache: false,
-                processData: false,
-                type: 'POST',
-                success: (data) => {
-                    console.log(data);
-                    let fi = {
-                        _id: data.id,
-                        $collection: 'flaw_information',
-                        flaw: obj.flaw,
-                        notes: obj.notes,
-                        priority: obj.priority,
-                        showPic: false,
-                        readOnly: true,
-                        pic: '' 
-                    };
-                    if (obj.pic) {
-                        let reader = new FileReader();
-                        reader.addEventListener('load', () => {
-                            fi.showPic = true;
-                            fi.pic = reader.result;
-                        }, false);
-                        reader.readAsDataURL(obj.pic);
-                    }
-                    this.flawInformation.push(fi);
-                }
-            });
-            */
         }
-
     }
 }
 </script>

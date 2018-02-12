@@ -3,26 +3,34 @@
     <dashboard v-model="activeui" />
 
     <flash-messages></flash-messages>
+    <loader v-if="activeui === 'LOADING'"></loader>
     <page-add
-        v-if="activeui === 'PROTOCOL_ADD'"
+        v-else-if="activeui === 'PROTOCOL_ADD'"
         v-model="protocol"
         :organizations="organizations"
         :facilities="facilities"
         :persons="persons"
         :categories="categories"
-        :inspection-standards="inspectionStandards">
+        :inspection-standards="inspectionStandards"
+        @submit="submitProtocol">
     </page-add>
+    <page-load
+        v-else-if="activeui === 'PROTOCOL_LOAD'">
+    </page-load>
   </div>
 </template>
 
 <script>
 import Dashboard from './Dashboard'
 import FlashMessages from './FlashMessages'
+import Loader from './Loader'
 
 import PageAdd from './PageAdd'
 import PageLoad from './PageLoad'
 
 import { EventBus } from "../EventBus.js";
+import { urlApi } from '../urls.js';
+import { postProtocol } from '../post.js';
 
 const $ = require('jquery');
 
@@ -31,6 +39,7 @@ export default {
     components: {
         Dashboard,
         FlashMessages,
+        Loader,
         PageAdd,
         PageLoad,
     },
@@ -39,34 +48,16 @@ export default {
             flashMessages: [],
             activeui: 'MAIN_MENU',
             protocol: {
-                id: null,
+                _id: null,
                 header: {},
                 entries: []
             },
 
-            organizations: [
-                { repr: 'HELLO', data: { _id: 'org_1' } },
-                { repr: 'HELL2', data: { _id: 'org_2' } },
-                { repr: 'LLOO3', data: { _id: 'org_3' } },
-                { repr: 'FRANK', data: { _id: 'org_4' } },
-                { repr: 'FFRANK', data: { _id: 'org_5' } },
-            ],
-            facilities: [
-                { repr: 'FASSS', data: { _id: 'fac_1' } },
-                { repr: 'LALSKS', data: { _id: 'fac_2' } },
-            ],
-            persons: [
-                { repr: 'PPERSON', data: { _id: 'per_1' } },
-                { repr: 'AMAAMA', data: { _id: 'per_2' } },
-            ],
-            inspectionStandards: [
-                { repr: 'INSPA', data: { _id: 'insp_1' } },
-                { repr: 'KASLDJASL', data: { _id: 'insp_2' } },
-            ],
-            categories: [
-                { repr: 'CATEAAG', data: { _id: 'cat_1' } },
-                { repr: 'M;ASNDMA;', data: { _id: 'cat_2' } },
-            ]
+            organizations: [],
+            facilities: [],
+            persons: [],
+            inspectionStandards: [],
+            categories: []
         }
     },
     created: function() {
@@ -76,13 +67,26 @@ export default {
         EventBus.$on('newCategoryAdded', (e) => this.categories.push(e));
         EventBus.$on('newInspectionStandardAdded', (e) => this.inspectionStandards.push(e));
 
-        /*
-        this.fetchOrganizations();
-        this.fetchFacilities();
-        this.fetchPersons();
-        this.fetchCategories();
-        this.fetchInspectionStandards();
-        */
+        this.fetch('organizations/', 
+            (i) => i.name,
+            (res) => this.organizations = res
+        );
+        this.fetch('facilities/',
+            (i) => i.name,
+            (res) => this.facilities = res
+        );
+        this.fetch('persons/',
+            (i) => i.name + ', ' + i.firstName,
+            (res) => this.persons = res
+        );
+        this.fetch('categories/',
+            (i) => i.name,
+            (res) => this.categories = res
+        );
+        this.fetch('inspectionStandards/',
+            (i) => i.name,
+            (res) => this.inspectionStandards = res
+        );
     },
     destroyed: function() {
         EventBus.$off('newFacilityAdded');
@@ -92,135 +96,34 @@ export default {
         EventBus.$off('newInspectionStandardAdded');
     },
     methods: {
-        log: function(e) {
-            console.log(e);
+        submitProtocol: function() {
+            this.activeui = 'LOADING';
+            postProtocol(this.protocol).then((_id) => {
+                EventBus.$emit('flash', { msg: 'Neues Protokoll angelegt.', status: 'okay' });
+                this.activeui = 'MAIN_MENU';
+                this.protocol.header = {};
+                this.protocol.entries = [];
+                this.protocol._id = null;
+            });
         },
-        submitNewForm: function() {
-
-        },
-        fetchCategories: function() {
+        fetch: function(endpoint, reprSelector, resultCallback) {
             $.ajax({
                 type: 'GET',
-                url: 'http://localhost:5000/categories/',
+                url: urlApi + endpoint,
                 data: {},
-                success: function(result, status) {
-                    console.log('FETCHED CATEGORIES');
-                    console.log(JSON.stringify(result));
+                success: function(resp, status) {
+                    console.log('FETCHED ' + endpoint);
+                    console.log(JSON.stringify(resp));
 
-                    this.categories = result.map((i) => { 
+                    resultCallback(resp.result.map(function(i) { 
                         return {
-                            repr: i.name,
+                            repr: reprSelector(i),
                             data: i
                         };
-                    });
+                    }));
                 }
             });
         },
-        fetchInspectionStandards: function() {
-            $.ajax({
-                type: 'GET',
-                url: 'http://localhost:5000/inspectionStandards/',
-                data: {},
-                success: function(result, status) {
-                    console.log('FETCHED INSPECTION_STANDARDS');
-                    console.log(JSON.stringify(result));
-
-                    this.inspectionStandards = result.map((i) => { 
-                        return {
-                            repr: i.name,
-                            data: i
-                        };
-                    });
-                }
-            });
-        },
-        fetchOrganizations: function() {
-            $.ajax({
-                type: 'GET',
-                url: 'http://localhost:5000/organizations/',
-                data: {},
-                success: function(result, status) {
-                    console.log('FETCHED ORGANIZATIONS');
-                    console.log(JSON.stringify(result));
-
-                    this.organizations = result.map((i) => { 
-                        return {
-                            repr: i.name,
-                            data: i
-                        };
-                    });
-                }
-            });
-        },
-        fetchFacilities: function() {
-            $.ajax({
-                type: 'GET',
-                url: 'http://localhost:5000/facilities/',
-                data: {},
-                success: function(result, status) {
-                    console.log('FETCHED FACILITIES');
-                    console.log(JSON.stringify(result));
-
-                    this.facilities = result.map((i) => { 
-                        return {
-                            repr: i.name,
-                            data: i
-                        };
-                    });
-                }
-            });
-        },
-        fetchPersons: function() {
-            $.ajax({
-                type: 'GET',
-                url: 'http://localhost:5000/persons/',
-                data: {},
-                success: function(result, status) {
-                    console.log('FETCHED PERSONS');
-                    console.log(JSON.stringify(result));
-
-                    this.persons = result.map((i) => { 
-                        return {
-                            repr: i.name + ', ' + i.firstName,
-                            data: i
-                        };
-                    });
-                }
-            });
-        },
-        get: function() {
-            let data = {
-                collection: 'testcollection',
-                q: 'hello',
-                on: 'testkey'
-            };
-            $.ajax({
-                type: 'GET',
-                url: 'http://localhost:5000/_suggestions/',
-                data: data,
-                success: function(result, status) {
-                    console.log(result);
-                }
-            });
-        },
-        put: function() {
-            let data = {
-                collection: 'testcollection',
-                data: {
-                    testkey: 'helloworld',
-                    otherkey: 'byeworld'
-                }
-            };
-            $.ajax({
-                type: 'POST',
-                url : 'http://localhost:5000/_data/',
-                data : JSON.stringify(data, null, '\t'),
-                contentType: 'application/json;charset=UTF-8',
-                success: function(result, status) {
-                    console.log(result);
-                }
-            });
-        }
     }
 }
 </script>

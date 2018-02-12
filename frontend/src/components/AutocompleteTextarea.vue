@@ -7,6 +7,7 @@
 <script>
 
 import DropsDown from './DropsDown';
+import { urlSuggest } from '../urls.js';
 
 const _ = require('lodash');
 const $ = require('jquery');
@@ -45,8 +46,11 @@ export default {
     },
     methods: {
         selected: function(e) {
-            this.dropdownItems = [];
+            this.clearSuggestions();
             this.ivalue = e.text;
+        },
+        clearSuggestions: function() {
+            this.dropdownItems = [];
         },
         fetchSuggestions: _.debounce( function() {
             if (this.ivalue.length <= 1) {
@@ -62,12 +66,14 @@ export default {
             console.log(JSON.stringify(data));
             $.ajax({
                 type: 'GET',
-                url: 'http://localhost:5000/_suggestions/',
+                url: urlSuggest,
                 data: data,
                 success: (resp, status) => {
                     console.log('RECIEVE');
                     console.log(JSON.stringify(resp));
-                    this.dropdownItems = resp.data.map((i) => { text: i });
+                    this.dropdownItems = resp.data.map(function(i) {
+                        return { repr: i }
+                    });
                 }
             });
         }, 500),

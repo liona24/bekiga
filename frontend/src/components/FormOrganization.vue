@@ -29,7 +29,7 @@
 <script>
 
 import { EventBus } from '../EventBus.js'
-import apiUrl from '../apiUrl.js'
+import { urlApi } from '../urls.js'
 
 const $ = require('jquery');
 
@@ -71,7 +71,7 @@ export default {
             formData.append('zipCode', this.props.zipCode);
 
             $.ajax({
-                url : apiUrl + 'organizations/',
+                url : urlApi + 'organizations/',
                 data: formData,
                 contentType: false,
                 cache: false,
@@ -88,7 +88,7 @@ export default {
                     };
 
                     EventBus.$emit('newOrganizationAdded', newItem);
-                    this.$parent.$emit('close', { success: true });
+                    this.$parent.$emit('close', { success: true, data: newItem });
                 }
             });
         }

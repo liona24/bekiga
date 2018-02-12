@@ -34,7 +34,7 @@
 <script>
 
 import { EventBus } from '../EventBus.js'
-import apiUrl from '../apiUrl.js'
+import { urlApi } from '../urls.js'
 
 const $ = require('jquery');
 
@@ -87,7 +87,7 @@ export default {
             formData.append('city', this.props.city);
 
             $.ajax({
-                url : apiUrl + 'facilities/',
+                url : urlApi + 'facilities/',
                 data: formData,
                 contentType: false,
                 cache: false,
@@ -104,14 +104,13 @@ export default {
                     };
 
                     EventBus.$emit('newFacilityAdded', newItem);
-                    console.log(_id);
 
                     if (this.props.picture) {
                         let formData = new FormData();
                         formData.append('pic', this.props.picture);
                         formData.append('_id', 'facility_' + _id)
                         $.ajax({
-                            url : apiUrl + 'files/',
+                            url : urlApi + 'files/',
                             data: formData,
                             contentType: false,
                             cache: false,
@@ -120,7 +119,7 @@ export default {
                         });
                     }
 
-                    this.$parent.$emit('close', { success: true });
+                    this.$parent.$emit('close', { success: true, data: newItem });
                 }
             });
         }

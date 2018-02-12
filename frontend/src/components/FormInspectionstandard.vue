@@ -17,7 +17,7 @@
 <script>
 
 import { EventBus } from '../EventBus.js'
-import apiUrl from '../apiUrl.js'
+import { urlApi } from '../urls.js'
 
 const $ = require('jquery');
 
@@ -52,7 +52,7 @@ export default {
             formData.append('name', this.props.name);
 
             $.ajax({
-                url : apiUrl + 'inspectionStandards/',
+                url : urlApi + 'inspectionStandards/',
                 data: formData,
                 contentType: false,
                 cache: false,
@@ -69,7 +69,7 @@ export default {
                     };
 
                     EventBus.$emit('newInspectionStandardAdded', newItem);
-                    this.$parent.$emit('close', { success: true });
+                    this.$parent.$emit('close', { success: true, data: newItem });
                 }
             });
         }

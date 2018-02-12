@@ -75,6 +75,7 @@ export default {
             if (e.success) {
                 console.log('CREATED');
                 console.log(e);
+                this.setValue(Object.assign({}, e.data));
             }
         },
         getNew: function() {

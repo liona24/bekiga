@@ -1,8 +1,17 @@
 from flask import Flask, g, request, session, render_template, jsonify, abort
+from flask.json import JSONEncoder
 from flask_pymongo import PyMongo, ObjectId
 from pymongo.errors import OperationFailure
 
 import re
+
+class MongoIdEncoder(JSONEncoder):
+    def default(self, o):
+        if isinstance(o, ObjectId):
+            return str(o)
+        return JSONEncoder.default(self, o)
+
+Flask.json_encoder = MongoIdEncoder
 
 app = Flask(__name__, static_folder='../dist/static', template_folder='../dist', instance_relative_config=True)
 app.config.from_object('settings')
@@ -58,7 +67,7 @@ def api(collection):
         if '_id' in args:
             result = mongo_one(collection, args['_id'])
         else:
-            result = mongo.db[collection].find(args)
+            result = list(mongo.db[collection].find(args))
     elif request.method == 'POST':
         result = { '_id': str(mongo.db[collection].insert_one(args).inserted_id) }
     elif request.method == 'PATCH':
@@ -108,6 +117,10 @@ def persons():
 @app.route('/api/entries/', methods=['GET', 'POST', 'PATCH', 'DELETE'])
 def entries():
     return api('entries')
+
+@app.route('/api/flaws/', methods=['GET', 'POST', 'PATCH', 'DELETE'])
+def flaws():
+    return api('flaws')
 
 @app.route('/api/files/', methods=['GET', 'POST'])
 def files():
