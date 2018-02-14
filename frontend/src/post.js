@@ -3,10 +3,12 @@ const $ = require('jquery');
 
 function postFlaw(flaw) {
     return new Promise(function(resolve) {
+        let pictureType = flaw.pictureFile ? flaw.pictureFile.name.split('.').pop() : null;
         let formData = new FormData();
         formData.append('flaw', flaw.flaw);
         formData.append('notes', flaw.notes);
         formData.append('priority', flaw.priority);
+        formData.append('picture', pictureType);
 
         $.ajax({
             type: 'POST',
@@ -20,13 +22,13 @@ function postFlaw(flaw) {
                 console.log('FLAW SUBMITTED - ID=' + _id);
                 flaw._id = _id;
 
-                if (flaw.pictureFile) {
-                    let formData = new FormData();
-                    formData.append('pic', flaw.pictureFile);
-                    formData.append('_id', 'flaw_' + _id);
+                if (pictureType) {
+                    let pictureForm = new FormData();
+                    pictureForm.append('pic', flaw.pictureFile);
+                    pictureForm.append('_id', 'flaw_' + _id + '.' + pictureType);
                     $.ajax({
                         url : urlApi + 'files/',
-                        data: formData,
+                        data: pictureForm,
                         contentType: false,
                         cache: false,
                         processData: false,

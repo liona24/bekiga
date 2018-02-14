@@ -1,2 +1,5 @@
-export const urlApi = 'http://localhost:5000/api/';
-export const urlSuggest = 'http://localhost:5000/_suggestions/';
+const urlBase = 'http://localhost:5000';
+
+export const urlApi = urlBase + '/api/';
+export const urlSuggest = urlBase + '/_suggestions/';
+export const urlRender = urlBase + '/render/';

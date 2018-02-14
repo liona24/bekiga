@@ -29,8 +29,8 @@ import PageAdd from './PageAdd'
 import PageLoad from './PageLoad'
 
 import { EventBus } from "../EventBus.js";
-import { urlApi } from '../urls.js';
 import { postProtocol } from '../post.js';
+import { urlApi, urlRender } from '../urls.js';
 
 const $ = require('jquery');
 
@@ -96,6 +96,9 @@ export default {
         EventBus.$off('newInspectionStandardAdded');
     },
     methods: {
+        renderProtocol: function(_id) {
+            window.open(urlRender + _id);
+        },
         submitProtocol: function() {
             this.activeui = 'LOADING';
             postProtocol(this.protocol).then((_id) => {
@@ -104,6 +107,8 @@ export default {
                 this.protocol.header = {};
                 this.protocol.entries = [];
                 this.protocol._id = null;
+
+                this.renderProtocol(_id);
             });
         },
         fetch: function(endpoint, reprSelector, resultCallback) {

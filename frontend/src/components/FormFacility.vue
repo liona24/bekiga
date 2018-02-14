@@ -80,11 +80,15 @@ export default {
             }
             $(e.target).prop('disabled', true);
 
+            console.log(this.props.picture);
+            let pictureType = this.props.picture ? this.props.picture.name.split('.').pop() : null;
+
             let formData = new FormData();
             formData.append('name', this.props.name);
             formData.append('zipCode', this.props.zipCode);
             formData.append('street', this.props.street);
             formData.append('city', this.props.city);
+            formData.append('picture', pictureType);
 
             $.ajax({
                 url : urlApi + 'facilities/',
@@ -105,10 +109,10 @@ export default {
 
                     EventBus.$emit('newFacilityAdded', newItem);
 
-                    if (this.props.picture) {
+                    if (pictureType) {
                         let formData = new FormData();
                         formData.append('pic', this.props.picture);
-                        formData.append('_id', 'facility_' + _id)
+                        formData.append('_id', 'facility_' + _id + '.' + pictureType);
                         $.ajax({
                             url : urlApi + 'files/',
                             data: formData,

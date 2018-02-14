@@ -1,9 +1,15 @@
-from flask import Flask, g, request, session, render_template, jsonify, abort
+from flask import Flask, g, request, session, render_template, jsonify, abort, send_file
 from flask.json import JSONEncoder
 from flask_pymongo import PyMongo, ObjectId
 from pymongo.errors import OperationFailure
+from gridfs import GridFSBucket, NoFile
+import jinja2
+from jinja2 import Template
 
 import re
+import os
+import uuid
+import subprocess
 
 class MongoIdEncoder(JSONEncoder):
     def default(self, o):
@@ -27,13 +33,192 @@ if app.debug:
 mongo = PyMongo(app)
 FILE_STORAGE = 'files'
 
+TEX_PATH = 'tex/'
+
+tex_jinja = jinja2.Environment(
+    block_start_string = '\BLOCK{',
+    block_end_string = '}',
+    variable_start_string = '\VAR{',
+    variable_end_string = '}',
+    comment_start_string = '\#{',
+    comment_end_string = '}',
+    line_statement_prefix = '%%',
+    line_comment_prefix = '%#',
+    trim_blocks = True,
+    autoescape = False,
+    loader = jinja2.FileSystemLoader(os.path.abspath('.'))
+)
+
 def mongo_one(collection, str_id):
     return mongo.db[collection].find_one_or_404({ '_id': ObjectId(str_id) })
+
+def _resolve_foreign(obj, key, foreign_collection):
+    """
+    Resolve the value at `key` as foreign key on the given `foreign_collection`
+    """
+    f_id = obj.get(key, None)
+    if f_id is None:
+        abort(404)
+    
+    obj[key] = mongo_one(foreign_collection, f_id)
+
+class FileDownloader:
+    fs = None
+    fname = None
+    revision = None
+
+    def __init__(self, fs, fname, revision=-1):
+        self.fs = fs
+        self.fname = fname
+        self.revision = revision
+    
+    def download(self, folder):
+        dst = os.path.join(folder, self.fname)
+        try:
+            with open(dst, 'wb') as dst_file:
+                self.fs.download_to_stream_by_name(self.fname,
+                                                   dst_file,
+                                                   revision=self.revision)
+        except NoFile:
+            return None
+        
+        return self.fname
+
+
+def _render(**kvargs):
+    template = tex_jinja.get_template(os.path.join(TEX_PATH, 'template.tex'))
+    return template.render(**kvargs)
+
+
+def render_protocol(protocol):
+    sub_folder = os.path.join(TEX_PATH, uuid.uuid4().hex)
+    os.mkdir(sub_folder)
+
+    protocol['inspectionStandards'] = r' \\ '.join(protocol['inspectionStandards'])
+    tmp = protocol['facility']['picture']
+    if tmp:
+        protocol['facility']['picture'] = tmp.download(sub_folder);
+    for entry in protocol['entries']:
+        cat = entry['category']
+        cat['inspectionStandards'] = ', '.join(map(lambda i: i['name'], cat['inspectionStandards']))
+        for flaw in entry['flaws']:
+            flaw['notes'] = flaw['notes'].replace('\r\n', r'\newline ').replace('\n', r'\newline')
+            if flaw['picture']:
+                flaw['picture'] = flaw['picture'].download(sub_folder)
+    
+    with open(os.path.join(sub_folder, 'main.tex'), 'w') as dst_file:
+        dst_file.write(_render(**protocol))
+    
+    compiler = subprocess.Popen([
+        'pdflatex',
+        '-synctex=1',
+        '-interaction=nonstopmode',
+        'main.tex'
+    ], cwd=sub_folder)
+    compiler.wait()
+
+    pdf = open(os.path.join(sub_folder, 'main.pdf'), 'rb')
+    resp = send_file(pdf, attachment_filename='protocol.pdf')
+
+    os.rmdir(sub_folder)
+
+    return resp
+
+def find_full_protocol(str_id):
+    """
+    Get the protocol with id `str_id`. Resolves all foreign keys. Pictures will 
+    be available as FileDownloader s.
+    Returns a dictionary representing the protocol.
+    """
+    protocol = {
+        'title': '',
+        'inspectionStandards': '',
+        'inspectionDate': '',
+        'attendees': '',
+        'facility': '',
+        'inspector': '',
+        'issuer': '',
+        'entries': [], 
+    }
+
+    protocol.update(mongo_one('protocols', str_id))
+
+    protocol['inspectionStandards'] = protocol['inspectionStandards'].replace('\r\n', '\n').split('\n')
+
+    foreigns = [
+        ('inspector', 'persons'),
+        ('issuer', 'organizations'),
+        ('facility', 'facilities')
+    ]
+    [ _resolve_foreign(protocol, *i) for i in foreigns ]
+
+    _resolve_foreign(protocol['inspector'], 'organization', 'organizations')
+
+    fs = GridFSBucket(mongo.db, 'files')
+
+    if protocol['facility'].get('picture', False):
+        fac = protocol['facility']
+        fname = 'facility_' + str(fac['_id']) + '.' + fac['picture']
+        protocol['facility']['picture'] = FileDownloader(fs, fname)
+    
+    entries = []
+    for entry_id in protocol['entries'].split(','):
+        entry = {
+            'category': '',
+            'title': '',
+            'manufacturer': '',
+            'yearBuilt': '',
+            'inspectionSigns': '',
+            'manufactureInfoAvailable': '',
+            'easyAccess': '',
+            'flaws': [],
+            'index': '',
+        }
+        entry.update(mongo_one('entries', entry_id))
+
+        _resolve_foreign(entry, 'category', 'categories')
+        standards = []
+        for std_id in entry['category']['inspectionStandards'].split(','):
+            standards.append(mongo_one('inspectionStandards', std_id))
+        
+        entry['category']['inspectionStandards'] = standards
+
+        flaws = []
+        for flaw_id in entry['flaws'].split(','):
+            flaw = {
+                'flaw': '',
+                'priority': '',
+                'notes': '',
+                'picture': '',
+            }
+            flaw.update(mongo_one('flaws', flaw_id))
+
+            if flaw['picture']:
+                fname = 'flaw_' + str(flaw['_id']) + '.' + flaw['picture']
+                flaw['picture'] = FileDownloader(fs, fname)
+            
+            flaws.append(flaw)
+        
+        entry['flaws'] = flaws
+        entries.append(entry)
+    
+    protocol['entries'] = entries
+
+    return protocol
 
 @app.route('/', methods=['GET'])
 def index():
     """Render the main application page."""
     return render_template('index.html')
+
+@app.route('/render/<_id>', methods=['GET'])
+def render(_id):
+    """
+    Render the protocol identified given by the request argument `_id`.
+    Returns the rendered protocol as pdf.
+    """
+    _id = '5a840b7af11f9320ec388ba8'
+    return render_protocol(find_full_protocol(_id))
 
 def api(collection):
     """
