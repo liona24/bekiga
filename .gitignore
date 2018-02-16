@@ -16,6 +16,7 @@ yarn-error.log*
 /tmp
 /data
 settings.py
+/dist
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
