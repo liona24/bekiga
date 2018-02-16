@@ -1,4 +1,4 @@
-const urlBase = 'http://localhost:5000';
+const urlBase = '';
 
 export const urlApi = urlBase + '/api/';
 export const urlSuggest = urlBase + '/_suggestions/';
