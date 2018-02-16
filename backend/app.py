@@ -8,6 +8,7 @@ from jinja2 import Template
 
 import re
 import os
+from shutil import rmtree
 import uuid
 import subprocess
 
@@ -120,7 +121,7 @@ def render_protocol(protocol):
     pdf = open(os.path.join(sub_folder, 'main.pdf'), 'rb')
     resp = send_file(pdf, attachment_filename='protocol.pdf')
 
-    os.rmdir(sub_folder)
+    rmtree(sub_folder)
 
     return resp
 

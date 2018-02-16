@@ -5,16 +5,21 @@
 \usepackage{graphicx,color}
 \usepackage[utf8]{inputenc}
 \usepackage{verbatim}
-\usepackage{tabularx}       % Fuer Tabellen laenger als eine Seite
+\usepackage{tabularx}
 \usepackage{multicol}
 \usepackage{multirow}
 \usepackage{wrapfig}
 \usepackage{fancyhdr}
+\usepackage{pifont}
+\usepackage[inline]{enumitem}
+\usepackage{amssymb}
 
 \usepackage[left=0.5cm,right=0.5cm]{geometry}
 
 \usepackage[ngerman]{babel}
 \usepackage{blindtext}
+
+\newcommand{\checkx}{\rlap{$\square$}{\raisebox{2pt}{\large\hspace{1pt}\ding{51}}}}
 
 \fancyhead{}
 \cfoot{\parbox[t]{13cm}{\raggedright \VAR{title} \VAR{facility['name']} \\ \copyright \VAR{inspector['organization']['name']}, \VAR{inspector['organization']['street']}, \VAR{inspector['organization']['zipCode']} \VAR{inspector['organization']['city']} \\ Prüfer: \VAR{inspector['name']}}}
@@ -54,24 +59,41 @@
 	\BLOCK{ for entry in entries|sort(attribute='index') }
 	\begin{tabularx}{\textwidth}{ |l|X|X| }
 		\hline
-		\multirow{\VAR{entry['flaws']|length + 1}}{*}{\VAR{loop.index - 1}.} & \VAR{entry['category']['name']}: & \VAR{entry['category']['inspectionStandards']} \\
+		\multirow{\VAR{entry['flaws']|length + 1}}{*}{\VAR{loop.index - 1}.} & \VAR{entry['category']['name']}: \textbf{\VAR{entry['title']}}
+			\newline \textit{Hersteller:} \VAR{entry['manufacturer']}
+			\newline \textit{Baujahr:} \VAR{entry['yearBuilt']}
+			\BLOCK{ if entry['manufactureInfoAvailable'] != 'Keine Angabe' }
+				\newline \textit{Herstellerinformation lag vor:}
+				\begin{enumerate*}[itemjoin={\quad},label=$\square$]
+					\item\VAR{ '[\checkx]' if entry['manufactureInfoAvailable'] == 'Ja' else '' } Ja
+					\item\VAR{ '[\checkx]' if entry['manufactureInfoAvailable'] == 'Nein' else '' } Nein
+				\end{enumerate*}
+			\BLOCK{ endif }
+			\newline \textit{Prüfzeichen:} \VAR{entry['inspectionSigns']}
+			\BLOCK{ if entry['easyAccess'] != 'Keine Angabe' }
+				\newline
+				\begin{enumerate*}[itemjoin={\quad},label=$\square$]
+					\item\VAR{ '[\checkx]' if entry['easyAccess'] == 'Ja' else '' } leicht zugänglich (Kinder \textless 3 Jahre)
+				\end{enumerate*}
+			\BLOCK{ endif }
+			& \VAR{entry['category']['inspectionStandards']} \\
 		\BLOCK{ for flaw in entry['flaws'] }
 			\cline{2-3}
 			& \multicolumn{2}{>{\hsize=\dimexpr2\hsize+2\tabcolsep+\arrayrulewidth\relax}X|}{
 				\BLOCK{ if flaw['picture'] }
 					\begin{minipage}[t]{0.6\textwidth}
-						\textbf{Befund/Mangel:} \VAR{flaw['flaw']}\newline
-						\textbf{Priorität:} \VAR{flaw['priority']}\newline
-						\textbf{Bemerkung:} \VAR{flaw['notes']}
+						\textit{Befund/Mangel:} \VAR{flaw['flaw']}\newline
+						\textit{Priorität:} \VAR{flaw['priority']}\newline
+						\textit{Bemerkung:} \VAR{flaw['notes']}
 					\end{minipage}
 					\begin{minipage}[t]{0.33\textwidth}
 						\raggedleft
 						\vspace{-\ht\strutbox}\includegraphics[height=4cm]{\VAR{flaw['picture']}}
 					\end{minipage}
 				\BLOCK{ else }
-					\textbf{Befund/Mangel:} \VAR{flaw['flaw']}\newline
-					\textbf{Priorität:} \VAR{flaw['priority']}\newline
-					\textbf{Bemerkung:} \VAR{flaw['notes']}
+					\textit{Befund/Mangel:} \VAR{flaw['flaw']}\newline
+					\textit{Priorität:} \VAR{flaw['priority']}\newline
+					\textit{Bemerkung:} \VAR{flaw['notes']}
 				\BLOCK{ endif }
 			} \\
 		\BLOCK{ endfor }
