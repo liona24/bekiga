@@ -33,6 +33,7 @@ export default {
     background-color: rgba(209, 231, 255, 0.94);
     overflow-x: hidden;
     transition: 0.25s;
+    overflow-y: auto;
 }
 
 a.close {

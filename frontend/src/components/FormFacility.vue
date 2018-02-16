@@ -80,7 +80,6 @@ export default {
             }
             $(e.target).prop('disabled', true);
 
-            console.log(this.props.picture);
             let pictureType = this.props.picture ? this.props.picture.name.split('.').pop() : null;
 
             let formData = new FormData();

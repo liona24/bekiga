@@ -3,6 +3,7 @@
     @keydown.down="next"
     @keydown.up="previous"
     @keydown.enter="selectActive()"
+    @keydown.tab="selectActive()"
     >
     <slot></slot>
     <div class="dropdown">
@@ -10,7 +11,7 @@
             :key="'item-' + idx"
             class="dropdown-item" :class="{ 'dropdown-active': active === idx }"
             @mouseover="() => active = idx"
-            @click="selectActive()">
+            @mousedown="selectActive()">
             {{ item.repr }}
         </span>
     </div>
@@ -68,6 +69,8 @@ div {
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
     text-align: center;
+    overflow-y: auto;
+    max-height: 350px;
 }
 
 span.dropdown-item {

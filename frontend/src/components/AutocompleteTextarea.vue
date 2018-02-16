@@ -1,6 +1,11 @@
+
 <template>
     <drops-down :items="dropdownItems" @selected="selected">
-        <textarea v-model="ivalue" :placeholder="placeholder"></textarea>
+        <textarea :placeholder="placeholder"
+            @input="onInput($event.target.value)"
+            @blur="clearSuggestions()"
+            @keydown.esc="clearSuggestions()"
+            v-model="query"></textarea>
     </drops-down>
 </template>
 
@@ -29,38 +34,36 @@ export default {
     data: function() {
         return {
             dropdownItems: [],
-            ivalue: '',
         }
     },
-    watch: {
-        ivalue: function() {
-            this.$emit('input', this.ivalue);
-
-            if (this.ivalue) {
+    computed: {
+        query: {
+            get: function() {
+                return this.value;
+            },
+            set: function(v) {
+                this.$emit('input', v);
+            }
+        }
+    },
+    methods: {
+        onInput: function(value) {
+            if (!!value) {
                 this.fetchSuggestions();
             }
         },
-    },
-    created: function() {
-        this.ivalue = this.value;
-    },
-    methods: {
         selected: function(e) {
+            this.query = e.repr;
             this.clearSuggestions();
-            this.ivalue = e.text;
         },
         clearSuggestions: function() {
             this.dropdownItems = [];
         },
         fetchSuggestions: _.debounce( function() {
-            if (this.ivalue.length <= 1) {
-                return;
-            }
-
             let data = {
                 collection: this.collection,
                 on: this.mkey,
-                q: this.ivalue,
+                q: this.query,
             };
             console.log('GET:')
             console.log(JSON.stringify(data));
@@ -76,7 +79,7 @@ export default {
                     });
                 }
             });
-        }, 500),
+        }, 200),
     }
 }
 </script>

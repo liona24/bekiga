@@ -61,7 +61,10 @@ export default {
         }
     },
     created: function() {
-        EventBus.$on('newFacilityAdded', (e) => this.facilities.push(e));
+        EventBus.$on('newFacilityAdded', (e) => {
+            this.facilities.push(e)
+            console.log(e);
+        });
         EventBus.$on('newOrganizationAdded', (e) => this.organizations.push(e));
         EventBus.$on('newPersonAdded', (e) => this.persons.push(e));
         EventBus.$on('newCategoryAdded', (e) => this.categories.push(e));
