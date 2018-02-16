@@ -73,8 +73,8 @@ class FileDownloader:
         self.fname = fname
         self.revision = revision
     
-    def download(self, folder):
-        dst = os.path.join(folder, self.fname)
+    def download(self, dst_folder):
+        dst = os.path.join(dst_folder, self.fname)
         try:
             with open(dst, 'wb') as dst_file:
                 self.fs.download_to_stream_by_name(self.fname,
@@ -218,7 +218,6 @@ def render(_id):
     Render the protocol identified given by the request argument `_id`.
     Returns the rendered protocol as pdf.
     """
-    _id = '5a840b7af11f9320ec388ba8'
     return render_protocol(find_full_protocol(_id))
 
 def api(collection):
