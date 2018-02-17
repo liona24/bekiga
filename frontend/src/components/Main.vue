@@ -29,8 +29,8 @@ import PageAdd from './PageAdd'
 import PageLoad from './PageLoad'
 
 import { EventBus } from "../EventBus.js";
-import { postProtocol } from '../post.js';
-import { urlApi, urlRender } from '../urls.js';
+import { postProtocol, fetch } from '../ajax.js';
+import { urlRender } from '../urls.js';
 
 const $ = require('jquery');
 
@@ -70,23 +70,23 @@ export default {
         EventBus.$on('newCategoryAdded', (e) => this.categories.push(e));
         EventBus.$on('newInspectionStandardAdded', (e) => this.inspectionStandards.push(e));
 
-        this.fetch('organizations/', 
+        fetch('organizations/', 
             (i) => i.name,
             (res) => this.organizations = res
         );
-        this.fetch('facilities/',
+        fetch('facilities/',
             (i) => i.name,
             (res) => this.facilities = res
         );
-        this.fetch('persons/',
+        fetch('persons/',
             (i) => i.name + ', ' + i.firstName,
             (res) => this.persons = res
         );
-        this.fetch('categories/',
+        fetch('categories/',
             (i) => i.name,
             (res) => this.categories = res
         );
-        this.fetch('inspectionStandards/',
+        fetch('inspectionStandards/',
             (i) => i.name,
             (res) => this.inspectionStandards = res
         );
@@ -115,24 +115,6 @@ export default {
             }, () => {
                 this.activeui = 'MAIN_MENU';
                 EventBus.$emit('flash', { msg: 'Protokoll konnte nicht angelegt werden!', status: 'error' });
-            });
-        },
-        fetch: function(endpoint, reprSelector, resultCallback) {
-            $.ajax({
-                type: 'GET',
-                url: urlApi + endpoint,
-                data: {},
-                success: function(resp, status) {
-                    console.log('FETCHED ' + endpoint);
-                    console.log(JSON.stringify(resp));
-
-                    resultCallback(resp.result.map(function(i) { 
-                        return {
-                            repr: reprSelector(i),
-                            data: i
-                        };
-                    }));
-                }
             });
         },
     }

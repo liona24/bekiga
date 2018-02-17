@@ -123,3 +123,23 @@ export function postProtocol(protocol) {
         }, reject);
     });
 }
+
+export function fetch(endpoint, reprSelector, resultCallback, errorCallback) {
+    $.ajax({
+        type: 'GET',
+        url: urlApi + endpoint,
+        data: {},
+        success: function(resp, status) {
+            console.log('FETCHED ' + endpoint);
+            console.log(JSON.stringify(resp));
+
+            resultCallback(resp.result.map(function(i) { 
+                return {
+                    repr: reprSelector(i),
+                    data: i
+                };
+            }));
+        },
+        error: errorCallback
+    });
+}
