@@ -21,7 +21,7 @@ import FormHeader from './FormHeader'
 import { EventBus } from '../EventBus.js'
 
 export default {
-    name: 'PageAdd',
+    name: 'PageProtocol',
     components: {
         FormHeader,
         FormEntry

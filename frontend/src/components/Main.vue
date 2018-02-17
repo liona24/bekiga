@@ -1,11 +1,23 @@
 <template>
   <div>
-    <dashboard v-model="activeui" />
+    <div id="dashboard">
+        <div class="dashboard-float-right">
+            <a href="javascript:void(0)"  @click="logout">Logout</a>
+        </div>
+        <div class="dashboard-float-left">
+            <template v-if="activeui === 'PROTOCOL_LOAD'">
+                <a href="javascript:void(0)" class="symbol" @click="() => activeui = 'MAIN_MENU'">Zur&uuml;ck</a>
+            </template>
+            <template v-else-if="activeui === 'MAIN_MENU'">
+                <a href="javascript:void(0)" @click="() => activeui = 'PROTOCOL_LOAD'">Laden</a>
+            </template>
+        </div>
+    </div>
 
     <flash-messages></flash-messages>
     <loader v-if="activeui === 'LOADING'"></loader>
-    <page-add
-        v-else-if="activeui === 'PROTOCOL_ADD'"
+    <page-protocol
+        v-else-if="activeui === 'MAIN_MENU'"
         v-model="protocol"
         :organizations="organizations"
         :facilities="facilities"
@@ -13,7 +25,7 @@
         :categories="categories"
         :inspection-standards="inspectionStandards"
         @submit="submitProtocol">
-    </page-add>
+    </page-protocol>
     <page-load
         v-else-if="activeui === 'PROTOCOL_LOAD'">
     </page-load>
@@ -21,11 +33,10 @@
 </template>
 
 <script>
-import Dashboard from './Dashboard'
 import FlashMessages from './FlashMessages'
 import Loader from './Loader'
 
-import PageAdd from './PageAdd'
+import PageProtocol from './PageProtocol'
 import PageLoad from './PageLoad'
 
 import { EventBus } from "../EventBus.js";
@@ -37,10 +48,9 @@ const $ = require('jquery');
 export default {
     name: 'Main',
     components: {
-        Dashboard,
         FlashMessages,
         Loader,
-        PageAdd,
+        PageProtocol,
         PageLoad,
     },
     data: function() {
@@ -117,6 +127,57 @@ export default {
                 EventBus.$emit('flash', { msg: 'Protokoll konnte nicht angelegt werden!', status: 'error' });
             });
         },
+        logout: function() {
+            console.log('That would be a nice feature, wouldn\'t it?');
+        }
     }
 }
 </script>
+
+<style>
+
+div#dashboard {
+    position: fixed;
+    width: 100%;
+    z-index: 9999;
+    margin: 0px;
+    top: 0;
+    left: 0;
+}
+
+#dashboard {
+    background: #303F9F;
+    height: 63px;
+    text-align: center;
+}
+
+#dashboard a {
+    color: #E8EAF6;
+    text-decoration: none;
+    font-style: italic;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 9px;
+    margin-left: 3px;
+}
+
+#dashboard a:hover {
+    color: #303F9F;
+    background: #E8EAF6;
+}
+
+.dashboard-float-right {
+    float: right;
+    margin-right: 5px;
+    position: relative;
+    top: 30%;
+}
+
+.dashboard-float-left {
+    float: left;
+    margin-left: 5px;
+    position: relative;
+    top: 30%;
+}
+
+</style>
