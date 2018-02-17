@@ -1,10 +1,19 @@
 <template>
     <drops-down :items="dropdownItems" @selected="selected">
-        <input v-model="query" type="text" :disabled="!showDropdown" placeholder="Suche...">
+        <input 
+            v-model="query"
+            type="text"
+            :disabled="!showDropdown"
+            @mouseover="onMouseOver"
+            @mouseout="showPreview = false"
+            placeholder="Suche...">
         <div @click="clear" class="clear"><span>&times;</span></div>
+        <div v-if="showPreview" class="bubble">
+            <slot name="preview">Keine Vorschau verf&uuml;gbar</slot>
+        </div>
         <button @click.prevent="() => showDropdown = !showDropdown"><span class="arrow" :class="showDropdown ? 'asc' : 'dsc'"></span></button>
         <overlay :show="showCreateForm" @close="onCreateFormClosed">
-            <slot>No form given...</slot>
+            <slot>Nicht verf&uuml;gbar</slot>
         </overlay>
     </drops-down>
 </template>
@@ -30,6 +39,7 @@ export default {
         return {
             showDropdown: false,
             showCreateForm: false,
+            showPreview: false,
             query: ''
         }
     },
@@ -69,6 +79,11 @@ export default {
         clear: function() {
             this.setValue(this.getNew());
             this.showDropdown = false;
+        },
+        onMouseOver: function() {
+            if (this.value.data && this.value.data._id) {
+                this.showPreview = true;
+            }
         },
         onCreateFormClosed: function(e) {
             this.showCreateForm = false;
