@@ -141,30 +141,25 @@ img {
     background-color: #FFF;
     border-radius: 5px;
     box-shadow: 0px 0px 6px #303F9F;
-    height: 200px;
-    width:  275px;
     position: absolute;
+    min-width: 250px;
+    min-height: 100px;
     z-index: 1;
     margin-left: 440px;
     margin-top: -30px;
 
 }
-
-.bubble::after {
-    background-color: #FFF;
-    box-shadow: -2px 2px 2px 0 #303F9F;
-    content: "\00a0";
-    display: block;
-    height: 20px;
-    left: -10px;
-    position: relative;
-    top: 20px;
-    transform:             rotate( 45deg );
-        -moz-transform:    rotate( 45deg );
-        -ms-transform:     rotate( 45deg );
-        -o-transform:      rotate( 45deg );
-        -webkit-transform: rotate( 45deg );
-    width:  20px;
+.preview p {
+    font-size:1em; 
+    font-style: normal;
+    font-weight: normal;
+    font-family:arial, sans-serif; 
+    text-indent:10px; 
+    outline: 0 none;
+    color:#333; 
+    text-align: center;
+    margin: 7px;
+    padding: 5px;
 }
 
 </style>
