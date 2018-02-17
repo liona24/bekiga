@@ -7,7 +7,8 @@ export default {
     name: 'Loader',
     props: {
         size: {
-            default: 150
+            default: 150,
+            type: Number
         }
     },
     computed: {
