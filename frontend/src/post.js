@@ -2,7 +2,7 @@ import { urlApi } from './urls.js';
 const $ = require('jquery');
 
 function postFlaw(flaw) {
-    return new Promise(function(resolve) {
+    return new Promise(function(resolve, reject) {
         let pictureType = flaw.pictureFile ? flaw.pictureFile.name.split('.').pop() : null;
         let formData = new FormData();
         formData.append('flaw', flaw.flaw);
@@ -40,13 +40,14 @@ function postFlaw(flaw) {
                 }
 
                 resolve(_id);
-            }
+            },
+            error: reject
         });
     });
 }
 
 function postEntry(entry, index) {
-    return new Promise(function(resolve) {
+    return new Promise(function(resolve, reject) {
         let deferredFlaws = [];
         entry.flawInformation.forEach((flaw) => {
             deferredFlaws.push(postFlaw(flaw));
@@ -77,15 +78,15 @@ function postEntry(entry, index) {
                     entry._id = _id;
 
                     resolve(_id);
-                }
+                },
+                error: reject
             });
-        });
-
+        }, reject);
     });
 }
 
 export function postProtocol(protocol) {
-    return new Promise(function(resolve) {
+    return new Promise(function(resolve, reject) {
         let deferredEntries = [];
         protocol.entries.forEach((item, index) => {
             let entry = item.data;
@@ -116,8 +117,9 @@ export function postProtocol(protocol) {
                     console.log('PROTOCOL SUBMITTED - ID=' + _id);
 
                     resolve(_id);
-                }
+                },
+                error: reject
             });
-        });
+        }, reject);
     });
 }

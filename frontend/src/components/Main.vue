@@ -112,6 +112,9 @@ export default {
                 this.protocol._id = null;
 
                 this.renderProtocol(_id);
+            }, () => {
+                this.activeui = 'MAIN_MENU';
+                EventBus.$emit('flash', { msg: 'Protokoll konnte nicht angelegt werden!', status: 'error' });
             });
         },
         fetch: function(endpoint, reprSelector, resultCallback) {
