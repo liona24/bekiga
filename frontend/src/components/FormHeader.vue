@@ -86,41 +86,10 @@ export default {
         persons: Array,
         facilities: Array,
     },
-    data: function() {
-        return {
-            props: '' 
-        };
-    },
-    watch: {
+    computed: {
         props: function() {
-            this.$emit('input', this.props);
+            return this.value;
         }
-    },
-    created: function() {
-        this.props = this.value.title !== undefined ? this.value : {
-            title: '',
-            inspectionStandards: '',
-            inspectionDate: '',
-            attendees: '',
-            facility: {
-                repr: '',
-                data: {
-                    _id: ''
-                }
-            },
-            inspector: {
-                repr: '',
-                data: {
-                    _id: ''
-                }
-            },
-            issuer: {
-                repr: '',
-                data: {
-                    _id: ''
-                }
-            }
-        };
     },
 }
 </script>

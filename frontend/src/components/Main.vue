@@ -59,7 +59,7 @@ export default {
             activeui: 'MAIN_MENU',
             protocol: {
                 _id: null,
-                header: {},
+                header: this.newHeaderData(),
                 entries: []
             },
 
@@ -117,7 +117,7 @@ export default {
             postProtocol(this.protocol).then((_id) => {
                 EventBus.$emit('flash', { msg: 'Neues Protokoll angelegt.', status: 'okay' });
                 this.activeui = 'MAIN_MENU';
-                this.protocol.header = {};
+                this.protocol.header = this.newHeaderData();
                 this.protocol.entries = [];
                 this.protocol._id = null;
 
@@ -129,7 +129,33 @@ export default {
         },
         logout: function() {
             console.log('That would be a nice feature, wouldn\'t it?');
-        }
+        },
+        newHeaderData: function() {
+            return {
+                title: '',
+                inspectionStandards: '',
+                facility: {
+                    repr: '',
+                    data: {
+                        _id: null,
+                    }
+                },
+                inspectionDate: '',
+                inspector: {
+                    repr: '',
+                    data: {
+                        _id: null,
+                    }
+                },
+                issuer: {
+                    repr: '',
+                    data: {
+                        _id: null,
+                    }
+                },
+                attendees: ''
+            };
+        },
     }
 }
 </script>

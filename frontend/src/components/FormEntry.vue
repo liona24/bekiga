@@ -96,34 +96,14 @@ export default {
         categories: Array,
         inspectionStandards: Array
     },
-    data: function() {
-        return {
-            props: '',
-        };
-    },
-    created: function() {
-        this.props = this.value.title !== undefined ? this.value : {
-            category: {
-                repr: '',
-                data: {
-                    _id: null,
-                }
-            },
-            flawInformation: [],
-            title: '',
-            manufacturer: '',
-            yearBuilt: '', 
-            inspectionSigns: '',
-            manufactureInfoAvailable: 'Keine Angabe', 
-            easyAccess: 'Keine Angabe',
-        };
-        if (this.props.flawInformation.length === 0) {
-            this.props.flawInformation.push(this.newFlawInfoData());
+    computed: {
+        props: function() {
+            return this.value;
         }
     },
-    watch: {
-        props: function() {
-            this.$emit('input', this.props);
+    created: function() {
+        if (this.props.flawInformation.length === 0) {
+            this.props.flawInformation.push(this.newFlawInfoData());
         }
     },
     methods: {

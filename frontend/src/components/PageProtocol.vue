@@ -35,26 +35,14 @@ export default {
         categories: Array,
         inspectionStandards: Array,
     },
-    data: function() {
-        return {
-            protocol: {
-                header: '',
-                entries: []
-            }
-        }
-    },
-    watch: {
-        protocol: function() {
-            this.$emit('input', this.protocol);
-        }
-    },
     created: function() {
-        this.protocol = this.value;
-        if (this.protocol.header === undefined || this.protocol.header.title === undefined) {
-            this.protocol.header = this.newHeaderData();
-        }
         if (this.protocol.entries.length === 0) {
             this.addEntry();
+        }
+    },
+    computed: {
+        protocol: function() {
+            return this.value;
         }
     },
     methods: {
@@ -76,32 +64,6 @@ export default {
                 inspectionSigns: '',
                 manufactureInfoAvailable: 'Keine Angabe', 
                 easyAccess: 'Keine Angabe',
-            };
-        },
-        newHeaderData: function() {
-            return {
-                title: '',
-                inspectionStandards: '',
-                facility: {
-                    repr: '',
-                    data: {
-                        _id: null,
-                    }
-                },
-                inspectionDate: '',
-                inspector: {
-                    repr: '',
-                    data: {
-                        _id: null,
-                    }
-                },
-                issuer: {
-                    repr: '',
-                    data: {
-                        _id: null,
-                    }
-                },
-                attendees: ''
             };
         },
         deleteEntry: function(index) {
