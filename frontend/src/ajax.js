@@ -148,18 +148,12 @@ export function fetch(endpoint, reprSelector, resultCallback, errorCallback) {
 
 function getSimple(_id, type) {
     return new Promise((resolve, reject) => {
-        let formData = new FormData();
-        formData.append('_id', _id);
-
         $.ajax({
             url : urlApi + endpointByType(type),
-            data: formData,
-            contentType: false,
-            cache: false,
-            processData: false,
+            data: { _id: _id },
             type: 'GET',
             success: (resp) => {
-                let res = resp.result;
+                let res = resp.result[0];
                 resolve({
                     repr: getRepr(res, type),
                     data: res

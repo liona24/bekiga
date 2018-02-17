@@ -19,20 +19,20 @@ export function getRepr(obj, type) {
 export function endpointByType(type) {
     switch (type) {
         case 'organization':
-            return '/organizations';
+            return 'organizations/';
         case 'entry':
-            return '/entries';
+            return 'entries/';
         case 'protocol':
-            return '/protocols';
+            return 'protocols/';
         case 'person':
-            return '/persons';
+            return 'persons/';
         case 'category':
-            return '/categories';
+            return 'categories/';
         case 'facility':
-            return '/facilities';
+            return 'facilities/';
         case 'inspectionStandard':
-            return '/inspectionStandards';
+            return 'inspectionStandards/';
         case 'flaw':
-            return '/flaws';
+            return 'flaws/';
     }
 }
