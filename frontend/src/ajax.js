@@ -1,4 +1,6 @@
 import { urlApi } from './urls.js';
+import { endpointByType, getRepr } from './helpers.js';
+
 const $ = require('jquery');
 
 function postFlaw(flaw) {
@@ -141,5 +143,90 @@ export function fetch(endpoint, reprSelector, resultCallback, errorCallback) {
             }));
         },
         error: errorCallback
+    });
+}
+
+function getSimple(_id, type) {
+    return new Promise((resolve, reject) => {
+        let formData = new FormData();
+        formData.append('_id', _id);
+
+        $.ajax({
+            url : urlApi + endpointByType(type),
+            data: formData,
+            contentType: false,
+            cache: false,
+            processData: false,
+            type: 'GET',
+            success: (resp) => {
+                let res = resp.result;
+                resolve({
+                    repr: getRepr(res, type),
+                    data: res
+                });
+            },
+            error: reject
+        });
+    });
+}
+
+export function getOrganization(_id) {
+    return getSimple(_id, 'organization');
+}
+
+export function getInspectionStandard(_id) {
+    return getSimple(_id, 'inspectionStandard');
+}
+
+export function getCategory(_id) {
+    return new Promise((resolve, reject) => {
+        getSimple(_id, 'category').then((result) => {
+            let data = result.data;
+            let deferredInspStds = data.inspectionStandards.split(',').map(getInspectionStandard);
+
+            $.when(...deferredInspStds).then((results) => {
+                console.log(results);
+            }, reject);
+        }, reject);
+    });
+}
+
+export function getPerson(_id) {
+    return new Promise((resolve, reject) => {
+        getSimple(_id, 'person').then((person) => {
+            getSimple(person.data.organization, 'organization').then((org) => {
+                person.data.organization = org;
+                resolve(person);
+            }, reject);
+        }, reject);
+    });
+}
+
+export function getFacility(_id) {
+    return new Promise((resolve, reject) => {
+        getSimple(_id, 'facility').then((facility) => {
+            if (facility.data.picture) {
+                let formData = new FormData();
+                formData.append('_id', 'facility_' + _id + '.' + facility.data.picture);
+                $.ajax({
+                    url : urlApi + 'files/',
+                    data: formData,
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    type: 'GET',
+                    success: (resp) => {
+                        console.log('RECIEVE FILE');
+                        console.log(resp);
+
+                        // TODO store image
+                        resolve(facility);
+                    },
+                    error: reject
+                });
+            } else {
+                resolve(facility);
+            }
+        }, reject);
     });
 }
