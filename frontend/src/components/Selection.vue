@@ -46,6 +46,8 @@ export default {
     created: function() {
         if (this.value.repr === undefined) {
             this.setValue(this.getNew());
+        } else {
+            this.query = this.value.repr;
         }
     },
     watch: {
@@ -94,7 +96,7 @@ export default {
             }
         },
         getNew: function() {
-            return { repr: '' };
+            return { repr: '', data: { _id: null } };
         },
         setValue: function(v) {
             this.$emit('input', v);
