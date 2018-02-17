@@ -153,7 +153,7 @@ function getSimple(_id, type) {
             data: { _id: _id },
             type: 'GET',
             success: (resp) => {
-                let res = resp.result[0];
+                let res = resp.result;
                 resolve({
                     repr: getRepr(res, type),
                     data: res
@@ -199,15 +199,12 @@ export function getPerson(_id) {
 export function getFacility(_id) {
     return new Promise((resolve, reject) => {
         getSimple(_id, 'facility').then((facility) => {
+            console.log(JSON.stringify(facility));
             if (facility.data.picture) {
-                let formData = new FormData();
-                formData.append('_id', 'facility_' + _id + '.' + facility.data.picture);
+                let data = { _id: 'facility_' + _id + '.' + facility.data.picture};
                 $.ajax({
                     url : urlApi + 'files/',
-                    data: formData,
-                    contentType: false,
-                    cache: false,
-                    processData: false,
+                    data: data,
                     type: 'GET',
                     success: (resp) => {
                         console.log('RECIEVE FILE');

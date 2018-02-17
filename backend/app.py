@@ -245,7 +245,14 @@ def api(collection):
     Returns the number of deleted documents
     """
 
-    args = { i: request.form[i] for i in request.form }
+    if request.method == 'PATCH' or request.method == 'POST':
+        if request.form is None:
+            abort(400)
+        args = { i: request.form[i] for i in requests.form }
+    else:
+        if request.args is None:
+            abort(400)
+        args = { i: request.args[i] for i in request.args }
 
     result = None
     if request.method == 'GET':
@@ -317,14 +324,17 @@ def files():
     The request should provide the file.
     """
 
-    _id = request.form.get('_id', None)
-    if _id is None:
-        abort(400)
 
     if request.method == 'GET':
+        _id = request.args.get('_id', None)
+        if _id is None:
+            abort(400)
         return mongo.send_file(_id, FILE_STORAGE)
 
     # request.method == 'POST'
+    _id = request.form.get('_id', None)
+    if _id is None:
+        abort(400)
     file = [ request.files[i] for i in request.files ]
     if len(file) != 1:
         abort(400)
