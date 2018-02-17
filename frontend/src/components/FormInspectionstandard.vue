@@ -69,7 +69,12 @@ export default {
                     };
 
                     EventBus.$emit('newInspectionStandardAdded', newItem);
+                    EventBus.$emit('flash', { msg: 'Prüfgrundlage wurde hinzugefügt!', status: 'okay' });
                     this.$parent.$emit('close', { success: true, data: newItem });
+                },
+                error: () => {
+                    EventBus.$emit('flash', { msg: 'Fehler! Prüfgrundlage konnte nicht erstellt werden!', status: 'error' });
+                    this.$parent.$emit('close', { success: false });
                 }
             });
         }

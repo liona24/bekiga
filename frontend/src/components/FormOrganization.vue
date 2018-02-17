@@ -88,7 +88,12 @@ export default {
                     };
 
                     EventBus.$emit('newOrganizationAdded', newItem);
+                    EventBus.$emit('flash', { msg: 'Organisation wurde hinzugefügt!', status: 'okay' });
                     this.$parent.$emit('close', { success: true, data: newItem });
+                },
+                error: () => {
+                    EventBus.$emit('flash', { msg: 'Fehler! Organisation konnte nicht erstellt werden!', status: 'error' });
+                    this.$parent.$emit('close', { success: false });
                 }
             });
         }

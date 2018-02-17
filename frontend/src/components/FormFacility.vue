@@ -122,7 +122,12 @@ export default {
                         });
                     }
 
+                    EventBus.$emit('flash', { msg: 'Einrichtung wurde hinzugefügt!', status: 'okay' });
                     this.$parent.$emit('close', { success: true, data: newItem });
+                },
+                error: () => {
+                    EventBus.$emit('flash', { msg: 'Fehler! Einrichtung konnte nicht erstellt werden!', status: 'error' });
+                    this.$parent.$emit('close', { success: false });
                 }
             });
         }
