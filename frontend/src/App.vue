@@ -145,8 +145,8 @@ img {
     min-width: 250px;
     min-height: 100px;
     z-index: 1;
-    margin-left: 440px;
-    margin-top: -30px;
+    margin-left: 431px;
+    margin-top: -65px;
 
 }
 .preview p {
