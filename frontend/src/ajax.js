@@ -5,7 +5,7 @@ const $ = require('jquery');
 
 function postFlaw(flaw) {
     return new Promise(function(resolve, reject) {
-        let pictureType = flaw.pictureFile ? flaw.pictureFile.name.split('.').pop() : null;
+        let pictureType = flaw.pictureFile ? flaw.pictureFile.name.split('.').pop() : '';
         let formData = new FormData();
         formData.append('flaw', flaw.flaw);
         formData.append('notes', flaw.notes);
@@ -172,6 +172,10 @@ export function getInspectionStandard(_id) {
     return getSimple(_id, 'inspectionStandard');
 }
 
+export function getFacility(_id) {
+    return getSimple(_id, 'facility');
+}
+
 export function getCategory(_id) {
     return new Promise((resolve, reject) => {
         getSimple(_id, 'category').then((result) => {
@@ -192,32 +196,6 @@ export function getPerson(_id) {
                 person.data.organization = org;
                 resolve(person);
             }, reject);
-        }, reject);
-    });
-}
-
-export function getFacility(_id) {
-    return new Promise((resolve, reject) => {
-        getSimple(_id, 'facility').then((facility) => {
-            console.log(JSON.stringify(facility));
-            if (facility.data.picture) {
-                let data = { _id: 'facility_' + _id + '.' + facility.data.picture};
-                $.ajax({
-                    url : urlApi + 'files/',
-                    data: data,
-                    type: 'GET',
-                    success: (resp) => {
-                        console.log('RECIEVE FILE');
-                        console.log(resp);
-
-                        // TODO store image
-                        resolve(facility);
-                    },
-                    error: reject
-                });
-            } else {
-                resolve(facility);
-            }
         }, reject);
     });
 }

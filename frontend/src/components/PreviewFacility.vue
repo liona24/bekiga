@@ -5,7 +5,7 @@
             <p>{{ props.name }}</p>
             <p>{{ props.street }}</p>
             <p>{{ props.zipCode }} {{ props.city }}</p>
-            <p> TODO: PICTURE </p>
+            <img v-if="props.picture" :src="imgSrc">
         </template>
     </div>
 </template>
@@ -13,6 +13,7 @@
 <script>
 import Loader from './Loader'
 
+import { urlApi } from '../urls.js'
 import { getFacility } from '../ajax.js'
 
 export default {
@@ -27,12 +28,18 @@ export default {
         return {
             isLoading: true,
             props: {
+                _id: '',
                 name: '',
                 street: '',
                 zipCode: '',
                 city: '',
                 picture: '',
             }
+        }
+    },
+    computed: {
+        imgSrc: function() {
+            return urlApi + 'files/?_id=facility_' + this.props._id + '.' + this.props.picture
         }
     },
     created: function() {
@@ -48,6 +55,14 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 
+img {
+    width: 180px;
+    height: 140px;
+    margin-left: -80px;
+    position: relative;
+    left: 50%;
+    float: none;
+}
 </style>
