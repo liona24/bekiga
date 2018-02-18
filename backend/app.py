@@ -248,7 +248,7 @@ def api(collection):
     if request.method == 'PATCH' or request.method == 'POST':
         if request.form is None:
             abort(400)
-        args = { i: request.form[i] for i in requests.form }
+        args = { i: request.form[i] for i in request.form }
     else:
         if request.args is None:
             abort(400)
