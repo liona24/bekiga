@@ -180,10 +180,24 @@ export function getCategory(_id) {
     return new Promise((resolve, reject) => {
         getSimple(_id, 'category').then((result) => {
             let data = result.data;
-            let deferredInspStds = data.inspectionStandards.split(',').map(getInspectionStandard);
+            let standards = data.inspectionStandards.split(',').map((i) => {
+                let rv = {
+                    result: '',
+                };
+                let promise = new Promise((resolve2, reject2) => {
+                    getInspectionStandard(i).then((std) => {
+                        rv.result = std;
+                        resolve2();
+                    }, reject2);
+                });
 
-            $.when(...deferredInspStds).then((results) => {
-                console.log(results);
+                rv.promise = promise;
+                return rv;
+            });
+
+            $.when(...standards.map((i) => i.promise)).then(() => {
+                data.inspectionStandards = standards.map((i) => i.result);
+                resolve(result);
             }, reject);
         }, reject);
     });
