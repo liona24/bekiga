@@ -1,10 +1,27 @@
 <template>
-    <div class="loader"></div>
+    <div class="loader" :style="styleObject"></div>
 </template>
 
 <script>
 export default {
-    name: 'Loader'
+    name: 'Loader',
+    props: {
+        size: {
+            default: 150,
+        }
+    },
+    computed: {
+        styleObject: function() {
+            let size = this.size + 'px';
+            let off = (-this.size / 2) + 'px';
+            return {
+                'width': size,
+                'height': size,
+                'margin-top': off,
+                'margin-left': off
+            };
+        }
+    }
 }
 </script>
 
@@ -14,14 +31,10 @@ export default {
     border: 16px solid #f3f3f3; /* Light grey */
     border-top: 16px solid #303F9F; /* Blue */
     border-radius: 50%;
-    width: 150px;
-    height: 150px;
     animation: spin 1.2s linear infinite;
     position: absolute;
     top: 50%;
     left: 50%;
-    margin-top: -75px;
-    margin-left: -75px;
 }
 
 @keyframes spin {

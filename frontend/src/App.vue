@@ -136,4 +136,30 @@ img {
     height: 45px;
     float: right;
 }
+
+.bubble{
+    background-color: #FFF;
+    border-radius: 5px;
+    box-shadow: 0px 0px 6px #303F9F;
+    position: absolute;
+    min-width: 250px;
+    min-height: 100px;
+    z-index: 1;
+    margin-left: 431px;
+    margin-top: -65px;
+
+}
+.preview p {
+    font-size:1em; 
+    font-style: normal;
+    font-weight: normal;
+    font-family:arial, sans-serif; 
+    text-indent:10px; 
+    outline: 0 none;
+    color:#333; 
+    text-align: center;
+    margin: 7px;
+    padding: 5px;
+}
+
 </style>

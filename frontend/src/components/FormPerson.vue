@@ -20,6 +20,7 @@
                 <span>Organisation:</span> 
                 <selection :items="organizations" v-model="props.organization">
                     <form-organization></form-organization>
+                    <preview-organization slot="preview" :data="props.organization.data"></preview-organization>
                 </selection>
             </label>
             <br>
@@ -32,6 +33,7 @@
 
 import FormOrganization from './FormOrganization'
 import Selection from './Selection'
+import PreviewOrganization from './PreviewOrganization'
 
 import { EventBus } from '../EventBus.js'
 import { urlApi } from '../urls.js'
@@ -43,6 +45,7 @@ export default {
     components: {
         Selection,
         FormOrganization,
+        PreviewOrganization
     },
     props: {
         name: {
@@ -98,7 +101,12 @@ export default {
                     };
 
                     EventBus.$emit('newPersonAdded', newItem);
+                    EventBus.$emit('flash', { msg: 'Person wurde hinzugefügt!', status: 'okay' });
                     this.$parent.$emit('close', { success: true, data: newItem });
+                },
+                error: () => {
+                    EventBus.$emit('flash', { msg: 'Fehler! Person konnte nicht erstellt werden!', status: 'error' });
+                    this.$parent.$emit('close', { success: false });
                 }
             });
         }

@@ -1,9 +1,11 @@
 import { urlApi } from './urls.js';
+import { endpointByType, getRepr } from './helpers.js';
+
 const $ = require('jquery');
 
 function postFlaw(flaw) {
-    return new Promise(function(resolve) {
-        let pictureType = flaw.pictureFile ? flaw.pictureFile.name.split('.').pop() : null;
+    return new Promise(function(resolve, reject) {
+        let pictureType = flaw.pictureFile ? flaw.pictureFile.name.split('.').pop() : '';
         let formData = new FormData();
         formData.append('flaw', flaw.flaw);
         formData.append('notes', flaw.notes);
@@ -40,13 +42,14 @@ function postFlaw(flaw) {
                 }
 
                 resolve(_id);
-            }
+            },
+            error: reject
         });
     });
 }
 
 function postEntry(entry, index) {
-    return new Promise(function(resolve) {
+    return new Promise(function(resolve, reject) {
         let deferredFlaws = [];
         entry.flawInformation.forEach((flaw) => {
             deferredFlaws.push(postFlaw(flaw));
@@ -77,15 +80,15 @@ function postEntry(entry, index) {
                     entry._id = _id;
 
                     resolve(_id);
-                }
+                },
+                error: reject
             });
-        });
-
+        }, reject);
     });
 }
 
 export function postProtocol(protocol) {
-    return new Promise(function(resolve) {
+    return new Promise(function(resolve, reject) {
         let deferredEntries = [];
         protocol.entries.forEach((item, index) => {
             let entry = item.data;
@@ -116,8 +119,99 @@ export function postProtocol(protocol) {
                     console.log('PROTOCOL SUBMITTED - ID=' + _id);
 
                     resolve(_id);
-                }
+                },
+                error: reject
             });
+        }, reject);
+    });
+}
+
+export function fetch(type) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            type: 'GET',
+            url: urlApi + endpointByType(type),
+            data: {},
+            success: function(resp, status) {
+                console.log('FETCHED ' + urlApi + endpointByType(type));
+                console.log(JSON.stringify(resp));
+
+                resolve(resp.result.map(function(i) { 
+                    return {
+                        repr: getRepr(i, type),
+                        data: i
+                    };
+                }));
+            },
+            error: reject
         });
+    });
+}
+
+function getSimple(_id, type) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url : urlApi + endpointByType(type),
+            data: { _id: _id },
+            type: 'GET',
+            success: (resp) => {
+                let res = resp.result;
+                resolve({
+                    repr: getRepr(res, type),
+                    data: res
+                });
+            },
+            error: reject
+        });
+    });
+}
+
+export function getOrganization(_id) {
+    return getSimple(_id, 'organization');
+}
+
+export function getInspectionStandard(_id) {
+    return getSimple(_id, 'inspectionStandard');
+}
+
+export function getFacility(_id) {
+    return getSimple(_id, 'facility');
+}
+
+export function getCategory(_id) {
+    return new Promise((resolve, reject) => {
+        getSimple(_id, 'category').then((result) => {
+            let data = result.data;
+            let standards = data.inspectionStandards.split(',').map((i) => {
+                let rv = {
+                    result: '',
+                };
+                let promise = new Promise((resolve2, reject2) => {
+                    getInspectionStandard(i).then((std) => {
+                        rv.result = std;
+                        resolve2();
+                    }, reject2);
+                });
+
+                rv.promise = promise;
+                return rv;
+            });
+
+            $.when(...standards.map((i) => i.promise)).then(() => {
+                data.inspectionStandards = standards.map((i) => i.result);
+                resolve(result);
+            }, reject);
+        }, reject);
+    });
+}
+
+export function getPerson(_id) {
+    return new Promise((resolve, reject) => {
+        getSimple(_id, 'person').then((person) => {
+            getSimple(person.data.organization, 'organization').then((org) => {
+                person.data.organization = org;
+                resolve(person);
+            }, reject);
+        }, reject);
     });
 }

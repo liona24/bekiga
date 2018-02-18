@@ -60,7 +60,7 @@ export default {
             },
             newInspectionStandard: {
                 repr: '',
-                data: { dasd: 'asdasd' }
+                data: { _id: null }
             }
         };
     },
@@ -110,7 +110,12 @@ export default {
                     };
 
                     EventBus.$emit('newCategoryAdded', newItem);
+                    EventBus.$emit('flash', { msg: 'Kategorie wurde hinzugefügt!', status: 'okay' });
                     this.$parent.$emit('close', { success: true, data: newItem });
+                },
+                error: () => {
+                    EventBus.$emit('flash', { msg: 'Fehler! Kategorie konnte nicht erstellt werden!', status: 'error' });
+                    this.$parent.$emit('close', { success: false });
                 }
             });
         }

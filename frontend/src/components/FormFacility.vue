@@ -80,7 +80,7 @@ export default {
             }
             $(e.target).prop('disabled', true);
 
-            let pictureType = this.props.picture ? this.props.picture.name.split('.').pop() : null;
+            let pictureType = this.props.picture ? this.props.picture.name.split('.').pop() : '';
 
             let formData = new FormData();
             formData.append('name', this.props.name);
@@ -122,7 +122,12 @@ export default {
                         });
                     }
 
+                    EventBus.$emit('flash', { msg: 'Einrichtung wurde hinzugefügt!', status: 'okay' });
                     this.$parent.$emit('close', { success: true, data: newItem });
+                },
+                error: () => {
+                    EventBus.$emit('flash', { msg: 'Fehler! Einrichtung konnte nicht erstellt werden!', status: 'error' });
+                    this.$parent.$emit('close', { success: false });
                 }
             });
         }

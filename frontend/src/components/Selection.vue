@@ -1,10 +1,21 @@
 <template>
     <drops-down :items="dropdownItems" @selected="selected">
-        <input v-model="query" type="text" :disabled="!showDropdown" placeholder="Suche...">
-        <div @click="clear" class="clear"><span>&times;</span></div>
-        <button @click.prevent="() => showDropdown = !showDropdown"><span class="arrow" :class="showDropdown ? 'asc' : 'dsc'"></span></button>
+        <div style="display: inline-block">
+            <input 
+                v-model="query"
+                type="text"
+                @focus="showDropdown = true"
+                @mouseover="onMouseOver"
+                @mouseout="showPreview = false"
+                @blur="showDropdown = false"
+                placeholder="Suche...">
+            <div @click="clear" class="clear"><span>&times;</span></div>
+        </div>
+        <div v-if="showPreview" class="bubble">
+            <slot name="preview">Keine Vorschau verf&uuml;gbar</slot>
+        </div>
         <overlay :show="showCreateForm" @close="onCreateFormClosed">
-            <slot>No form given...</slot>
+            <slot>Nicht verf&uuml;gbar</slot>
         </overlay>
     </drops-down>
 </template>
@@ -30,12 +41,15 @@ export default {
         return {
             showDropdown: false,
             showCreateForm: false,
+            showPreview: false,
             query: ''
         }
     },
     created: function() {
         if (this.value.repr === undefined) {
             this.setValue(this.getNew());
+        } else {
+            this.query = this.value.repr;
         }
     },
     watch: {
@@ -70,6 +84,11 @@ export default {
             this.setValue(this.getNew());
             this.showDropdown = false;
         },
+        onMouseOver: function() {
+            if (this.value.data && this.value.data._id) {
+                this.showPreview = true;
+            }
+        },
         onCreateFormClosed: function(e) {
             this.showCreateForm = false;
             if (e.success) {
@@ -79,7 +98,7 @@ export default {
             }
         },
         getNew: function() {
-            return { repr: '' };
+            return { repr: '', data: { _id: null } };
         },
         setValue: function(v) {
             this.$emit('input', v);
@@ -92,7 +111,7 @@ export default {
 
 input[type=text] {
     float: left;
-    width:300px; 
+    width:379px; 
     height:27px; 
     line-height:27px;
     text-indent:10px; 
@@ -103,35 +122,6 @@ input[type=text] {
     border:solid 1px #d9d9d9; 
     border-top:solid 1px #c0c0c0; 
     border-right:none;
-}
-
-button {
-    overflow: hidden;
-    vertical-align: top;
-    cursor: pointer;
-    margin-top: 7px;
-    margin-bottom: 7px;
-}
-
-.arrow {
-  display: inline-block;
-  vertical-align: middle;
-  width: 0;
-  height: 0;
-  margin-left: 5px;
-  opacity: 0.66;
-}
-
-.arrow.asc {
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-bottom: 4px solid rgb(0, 0, 0);
-}
-
-.arrow.dsc {
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-top: 4px solid rgb(0, 0, 0);
 }
 
 div.clear {

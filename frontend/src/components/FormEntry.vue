@@ -10,6 +10,7 @@
             <div class="category">
                 <selection v-model="props.category" :items="categories">
                     <form-category :inspection-standards="inspectionStandards"></form-category>
+                    <preview-category slot="preview" :data="props.category.data"></preview-category>
                 </selection>
             </div>
             <label>
@@ -81,6 +82,7 @@ import Selection from './Selection'
 import { EventBus } from '../EventBus.js'
 
 import FormCategory from './FormCategory'
+import PreviewCategory from './PreviewCategory'
 
 const $ = require('jquery');
 
@@ -90,40 +92,21 @@ export default {
         AutocompleteInput,
         Selection,
         FormCategory,
+        PreviewCategory
     },
     props: {
         value: Object,
         categories: Array,
         inspectionStandards: Array
     },
-    data: function() {
-        return {
-            props: '',
-        };
-    },
-    created: function() {
-        this.props = this.value.title !== undefined ? this.value : {
-            category: {
-                repr: '',
-                data: {
-                    _id: null,
-                }
-            },
-            flawInformation: [],
-            title: '',
-            manufacturer: '',
-            yearBuilt: '', 
-            inspectionSigns: '',
-            manufactureInfoAvailable: 'Keine Angabe', 
-            easyAccess: 'Keine Angabe',
-        };
-        if (this.props.flawInformation.length === 0) {
-            this.props.flawInformation.push(this.newFlawInfoData());
+    computed: {
+        props: function() {
+            return this.value;
         }
     },
-    watch: {
-        props: function() {
-            this.$emit('input', this.props);
+    created: function() {
+        if (this.props.flawInformation.length === 0) {
+            this.props.flawInformation.push(this.newFlawInfoData());
         }
     },
     methods: {
