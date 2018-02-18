@@ -58,10 +58,6 @@ export default {
 
 <style scoped>
 
-div {
-    margin-bottom: 5px;
-}
-
 .dropdown {
     position: absolute;
     background-color: #f9f9f9;

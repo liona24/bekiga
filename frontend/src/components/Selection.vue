@@ -1,17 +1,19 @@
 <template>
     <drops-down :items="dropdownItems" @selected="selected">
-        <input 
-            v-model="query"
-            type="text"
-            :disabled="!showDropdown"
-            @mouseover="onMouseOver"
-            @mouseout="showPreview = false"
-            placeholder="Suche...">
-        <div @click="clear" class="clear"><span>&times;</span></div>
+        <div style="display: inline-block">
+            <input 
+                v-model="query"
+                type="text"
+                @focus="showDropdown = true"
+                @mouseover="onMouseOver"
+                @mouseout="showPreview = false"
+                @blur="showDropdown = false"
+                placeholder="Suche...">
+            <div @click="clear" class="clear"><span>&times;</span></div>
+        </div>
         <div v-if="showPreview" class="bubble">
             <slot name="preview">Keine Vorschau verf&uuml;gbar</slot>
         </div>
-        <button @click.prevent="() => showDropdown = !showDropdown"><span class="arrow" :class="showDropdown ? 'asc' : 'dsc'"></span></button>
         <overlay :show="showCreateForm" @close="onCreateFormClosed">
             <slot>Nicht verf&uuml;gbar</slot>
         </overlay>
@@ -109,7 +111,7 @@ export default {
 
 input[type=text] {
     float: left;
-    width:300px; 
+    width:379px; 
     height:27px; 
     line-height:27px;
     text-indent:10px; 
@@ -120,35 +122,6 @@ input[type=text] {
     border:solid 1px #d9d9d9; 
     border-top:solid 1px #c0c0c0; 
     border-right:none;
-}
-
-button {
-    overflow: hidden;
-    vertical-align: top;
-    cursor: pointer;
-    margin-top: 7px;
-    margin-bottom: 7px;
-}
-
-.arrow {
-  display: inline-block;
-  vertical-align: middle;
-  width: 0;
-  height: 0;
-  margin-left: 5px;
-  opacity: 0.66;
-}
-
-.arrow.asc {
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-bottom: 4px solid rgb(0, 0, 0);
-}
-
-.arrow.dsc {
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-top: 4px solid rgb(0, 0, 0);
 }
 
 div.clear {
