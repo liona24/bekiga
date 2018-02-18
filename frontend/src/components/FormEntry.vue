@@ -10,6 +10,7 @@
             <div class="category">
                 <selection v-model="props.category" :items="categories">
                     <form-category :inspection-standards="inspectionStandards"></form-category>
+                    <preview-category slot="preview" :data="props.category.data"></preview-category>
                 </selection>
             </div>
             <label>
@@ -81,6 +82,7 @@ import Selection from './Selection'
 import { EventBus } from '../EventBus.js'
 
 import FormCategory from './FormCategory'
+import PreviewCategory from './PreviewCategory'
 
 const $ = require('jquery');
 
@@ -90,6 +92,7 @@ export default {
         AutocompleteInput,
         Selection,
         FormCategory,
+        PreviewCategory
     },
     props: {
         value: Object,

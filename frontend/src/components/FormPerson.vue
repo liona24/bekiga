@@ -20,6 +20,7 @@
                 <span>Organisation:</span> 
                 <selection :items="organizations" v-model="props.organization">
                     <form-organization></form-organization>
+                    <preview-organization slot="preview" :data="props.organization.data"></preview-organization>
                 </selection>
             </label>
             <br>
@@ -32,6 +33,7 @@
 
 import FormOrganization from './FormOrganization'
 import Selection from './Selection'
+import PreviewOrganization from './PreviewOrganization'
 
 import { EventBus } from '../EventBus.js'
 import { urlApi } from '../urls.js'
@@ -43,6 +45,7 @@ export default {
     components: {
         Selection,
         FormOrganization,
+        PreviewOrganization
     },
     props: {
         name: {
