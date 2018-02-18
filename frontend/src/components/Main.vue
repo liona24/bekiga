@@ -80,26 +80,11 @@ export default {
         EventBus.$on('newCategoryAdded', (e) => this.categories.push(e));
         EventBus.$on('newInspectionStandardAdded', (e) => this.inspectionStandards.push(e));
 
-        fetch('organizations/', 
-            (i) => i.name,
-            (res) => this.organizations = res
-        );
-        fetch('facilities/',
-            (i) => i.name,
-            (res) => this.facilities = res
-        );
-        fetch('persons/',
-            (i) => i.name + ', ' + i.firstName,
-            (res) => this.persons = res
-        );
-        fetch('categories/',
-            (i) => i.name,
-            (res) => this.categories = res
-        );
-        fetch('inspectionStandards/',
-            (i) => i.name,
-            (res) => this.inspectionStandards = res
-        );
+        fetch('organization').then((res) => this.organizations = res);
+        fetch('facility').then((res) => this.facilities = res);
+        fetch('person').then((res) => this.persons = res);
+        fetch('category').then((res) => this.categories = res);
+        fetch('inspectionStandard').then((res) => this.inspectionStandards = res);
     },
     destroyed: function() {
         EventBus.$off('newFacilityAdded');

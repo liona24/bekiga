@@ -126,23 +126,25 @@ export function postProtocol(protocol) {
     });
 }
 
-export function fetch(endpoint, reprSelector, resultCallback, errorCallback) {
-    $.ajax({
-        type: 'GET',
-        url: urlApi + endpoint,
-        data: {},
-        success: function(resp, status) {
-            console.log('FETCHED ' + endpoint);
-            console.log(JSON.stringify(resp));
+export function fetch(type) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            type: 'GET',
+            url: urlApi + endpointByType(type),
+            data: {},
+            success: function(resp, status) {
+                console.log('FETCHED ' + urlApi + endpointByType(type));
+                console.log(JSON.stringify(resp));
 
-            resultCallback(resp.result.map(function(i) { 
-                return {
-                    repr: reprSelector(i),
-                    data: i
-                };
-            }));
-        },
-        error: errorCallback
+                resolve(resp.result.map(function(i) { 
+                    return {
+                        repr: getRepr(i, type),
+                        data: i
+                    };
+                }));
+            },
+            error: reject
+        });
     });
 }
 
