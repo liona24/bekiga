@@ -60,7 +60,7 @@ export default {
             },
             newInspectionStandard: {
                 repr: '',
-                data: { dasd: 'asdasd' }
+                data: { _id: null }
             }
         };
     },
