@@ -58,7 +58,7 @@ export default {
             flashMessages: [],
             activeui: 'MAIN_MENU',
             protocol: {
-                _id: null,
+                _id: '',
                 header: this.newHeaderData(),
                 entries: []
             },
@@ -104,7 +104,7 @@ export default {
                 this.activeui = 'MAIN_MENU';
                 this.protocol.header = this.newHeaderData();
                 this.protocol.entries = [];
-                this.protocol._id = null;
+                this.protocol._id = '';
 
                 this.renderProtocol(_id);
             }, () => {
@@ -122,20 +122,20 @@ export default {
                 facility: {
                     repr: '',
                     data: {
-                        _id: null,
+                        _id: '',
                     }
                 },
                 inspectionDate: '',
                 inspector: {
                     repr: '',
                     data: {
-                        _id: null,
+                        _id: '',
                     }
                 },
                 issuer: {
                     repr: '',
                     data: {
-                        _id: null,
+                        _id: '',
                     }
                 },
                 attendees: ''

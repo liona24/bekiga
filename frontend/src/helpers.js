@@ -3,6 +3,7 @@ export function getRepr(obj, type) {
     case 'organization':
     case 'facility':
     case 'inspectionStandard':
+    case 'category':
         return obj.name;
     case 'person':
         return obj.name + ', ' + obj.firstName;
