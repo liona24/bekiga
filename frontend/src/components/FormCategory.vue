@@ -60,7 +60,7 @@ export default {
             },
             newInspectionStandard: {
                 repr: '',
-                data: { _id: null }
+                data: { _id: '' }
             }
         };
     },
@@ -89,7 +89,7 @@ export default {
 
             let formData = new FormData();
             formData.append('name', this.props.name);
-            formData.append('inspectionStandards', this.props.inspectionStandards.map((i) => i.data._id));
+            formData.append('inspectionStandards', this.props.inspectionStandards.filter((i) => i.data._id).map((i) => i.data._id));
 
             $.ajax({
                 url : urlApi + 'categories/',

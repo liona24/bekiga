@@ -65,7 +65,7 @@ export default {
                 category: {
                     repr: '',
                     data: {
-                        _id: null,
+                        _id: '',
                     }
                 },
                 flawInformation: [],
