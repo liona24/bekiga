@@ -1,13 +1,24 @@
 <template>
 <div id="forms">
-    <form-header v-model="protocol.header" :organizations="organizations" :persons="persons" :facilities="facilities"></form-header>
+    <form-header id="protocol-header" v-model="protocol.header" :organizations="organizations" :persons="persons" :facilities="facilities"></form-header>
     <form-entry v-for="(entry, index) in protocol.entries" 
         :key="'entryform-' + index"
+        :id="'entry-' + index"
         v-model="entry.data"
         :categories="categories"
         :inspection-standards="inspectionStandards"
         @delete="deleteEntry(index)">
     </form-entry>
+    <div class="navigation-sidebar">
+        <p>
+            <a class="header-link" href="#protocol-header">{{ protocol.header.title }}</a>
+        </p>
+        <ul>
+            <li v-for="(entry, idx) in protocol.entries" :key="'entrylink-' + idx">
+                <a class="entry-link" :href="'#entry-' + idx">{{ entry.data.title ? entry.data.title : 'Eintrag ' + (idx + 1) }}</a>
+            </li>
+        </ul>
+    </div>
     <input type="button" value="+" @click="addEntry" class="add-entry">
     <input type="button" value="Speichern" @click="submit" class="protocol-submit">
 </div>
@@ -104,4 +115,58 @@ input[type="button"].protocol-submit {
     font-weight: bold;
 }
 
+div.navigation-sidebar {
+    position: fixed;
+    top: 20%;
+    margin-left: 15px;
+    border: 2px solid #303F9F;
+    border-radius: 3px;
+    text-align: center;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.navigation-sidebar p {
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+a.header-link {
+    font-size:1.2em; 
+    font-style: normal;
+    font-weight: bold;
+    font-family:arial, sans-serif; 
+    color:#303F9F; 
+    text-decoration: none;
+}
+.navigation-sidebar ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+ 
+li {
+  font: 200 1em Helvetica, Verdana, sans-serif;
+  margin-bottom: 3px;
+  text-align: center;
+  padding: 5px;
+}
+ 
+a.entry-link {
+  text-decoration: none;
+  color: #000;
+  display: block;
+  width: 100%;
+ 
+  -webkit-transition: font-size 0.2s ease, background-color 0.2s ease;
+  -moz-transition: font-size 0.2s ease, background-color 0.2s ease;
+  -o-transition: font-size 0.2s ease, background-color 0.2s ease;
+  -ms-transition: font-size 0.2s ease, background-color 0.2s ease;
+  transition: font-size 0.2s ease, background-color 0.2s ease;
+}
+ 
+a.entry-link:hover {
+  font-size: 1.5em;
+  background: #E8EAF6;
+}
 </style>
