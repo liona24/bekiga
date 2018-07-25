@@ -1,5 +1,8 @@
 # bekiga
 
+**NOTE:** *This is a stale repository. The maintained repo can be found on [gitlab](https://gitlab.com/milckonare/bekiga).*
+
+
 A simple web application to render inspection protocols to PDF using *VueJS*, *Flask*, *MongoDB* and *LaTeX*.
 
 Einfaches Erstellen, Erzeugen und Darstellen von Prüfprotokollen für Kindergärten.
